@@ -15,7 +15,7 @@ export default function TagSection() {
   return (
     <div className="flex flex-col gap-1 mt-4">
       <div className="flex items-center justify-between px-3">
-        <SidebarSectionTitle title="Labels" />
+        <SidebarSectionTitle title="Tags" />
         <Button variant="ghost" size="icon" onClick={() => setOpen(true)}>
           <PlusIcon className="size-3" />
         </Button>

@@ -167,3 +167,7 @@ Only add comments where the logic is **genuinely non-obvious**. Do not:
 - Summarize what the code does (the code speaks for itself)
 - Add JSDoc for every function
 - Leave TODO comments without a tracked issue
+
+## 9. Additional information
+
+This project makes use of shadcn with base-ui and uses pnpm as package manager

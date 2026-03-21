@@ -1,5 +1,6 @@
 "use client";
 import Markdown from "react-markdown";
+import { twMerge } from "tailwind-merge";
 import type { Email, EmailMessage } from "@/types/email";
 import ResponseInputField from "./reply-composer/response-input-field";
 
@@ -24,11 +25,15 @@ function AttachmentList({ attachments }: { attachments?: string[] }) {
 }
 
 function BubbleContent({ message }: { message: EmailMessage }) {
-  const style = message.isFromMe
-    ? "bg-primary text-primary-foreground rounded-2xl rounded-tr-sm"
-    : "bg-muted text-foreground rounded-2xl rounded-tl-sm";
   return (
-    <div className={`${style} px-4 py-3 text-sm leading-relaxed`}>
+    <div
+      className={twMerge(
+        "px-4 py-3 rounded-2xl text-sm leading-relaxed",
+        message.isFromMe
+          ? "bg-primary text-primary-foreground rounded-tr-sm"
+          : "bg-muted text-foreground rounded-tl-sm",
+      )}
+    >
       <Markdown>{message.body}</Markdown>
     </div>
   );

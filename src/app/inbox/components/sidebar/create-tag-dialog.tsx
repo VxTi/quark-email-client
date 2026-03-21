@@ -33,7 +33,7 @@ export default function CreateTagDialog({ open, onOpenChange, onCreate }: Create
         <Dialog.Backdrop className="fixed inset-0 bg-black/40" />
         <Dialog.Popup className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card border border-border rounded-xl p-6 flex flex-col gap-4 shadow-lg w-80">
           <Dialog.Title className="text-sm font-semibold text-foreground">
-            Create New Label
+            Create a new tag
           </Dialog.Title>
           <InputField label="Label Name" value={name} onChange={setName} placeholder="e.g. Work" />
           <div className="flex flex-col gap-4">
