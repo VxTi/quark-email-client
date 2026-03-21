@@ -89,7 +89,7 @@ function ComposerInput({ editor, fileRef, onAttach, onFiles }: InputProps) {
         <ResponseInputToolbar />
         <div
           ref={editor.mount as React.Ref<HTMLDivElement>}
-          className="px-3 py-2 min-h-[60px] max-h-[160px] overflow-y-auto text-sm text-foreground outline-none leading-relaxed"
+          className="px-3 py-2 min-h-15 max-h-40 overflow-y-auto text-sm text-foreground outline-none leading-relaxed"
         />
       </ProseKit>
       <ComposerFooter fileRef={fileRef} onAttach={onAttach} onFiles={onFiles} />
@@ -100,7 +100,7 @@ function ComposerInput({ editor, fileRef, onAttach, onFiles }: InputProps) {
 export default function ResponseInputField() {
   const { editor, attachments, fileRef, onAttach, onFiles, remove } = useReplyComposer();
   return (
-    <div className="border-t border-border px-4 py-3 shrink-0 flex flex-col gap-2 max-h-[280px]">
+    <div className="border-t border-border px-4 py-3 shrink-0 flex flex-col gap-2 max-h-70">
       <AttachmentList attachments={attachments} onRemove={remove} />
       <ComposerInput editor={editor} fileRef={fileRef} onAttach={onAttach} onFiles={onFiles} />
     </div>

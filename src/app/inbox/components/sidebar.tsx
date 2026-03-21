@@ -1,9 +1,11 @@
 "use client";
+import { ArrowDiagonalIcon } from "@hugeicons/core-free-icons";
 import {
   type LucideIcon,
   MessageCircleIcon,
   PenLineIcon,
   PlusIcon,
+  SendIcon,
   SquarePenIcon,
   TagIcon,
   Trash2Icon,
@@ -21,9 +23,15 @@ interface SidebarItemProps {
   onClick: () => void;
 }
 
-const SIDEBAR_ACTIONS = [
-  { icon: MessageCircleIcon, text: "Messages" },
-  { icon: PenLineIcon, text: "Compose" },
+type SidebarItemType = {
+  icon: LucideIcon;
+  text: string;
+};
+
+const SIDEBAR_ACTIONS: SidebarItemType[] = [
+  { icon: MessageCircleIcon, text: "Inbox" },
+  { icon: SendIcon, text: "Sent" },
+  { icon: PenLineIcon, text: "Drafts" },
   { icon: Trash2Icon, text: "Trash" },
 ];
 
@@ -51,7 +59,7 @@ export default function Sidebar({ onCompose }: { onCompose: () => void }) {
   const { data: session } = authClient.useSession();
 
   return (
-    <aside className="h-full flex flex-col border-r border-border bg-card p-3 gap-1 shrink-0">
+    <aside className="h-full w-60 p-4 flex flex-col border-r border-border bg-card gap-1 shrink-0">
       <SidebarHeader user={session?.user} onCompose={onCompose} />
       <SidebarSectionTitle title="Mailbox" />
       {SIDEBAR_ACTIONS.map((action) => (
@@ -85,13 +93,13 @@ function SidebarHeader({
 
 function UserAvatar({ user }: { user?: { image?: string | null; name: string } | null }) {
   return (
-    <div className="sidebar-text flex items-center gap-2 overflow-hidden">
+    <div className="sidebar-text flex items-center gap-2 overflow-hidden *:size-4">
       {user?.image ? (
         <Image src={user.image} alt="" width={24} height={24} className="rounded-full" />
       ) : (
-        <UserIcon className="h-5 w-5 text-muted-foreground" />
+        <UserIcon className="text-muted-foreground" />
       )}
-      <span className="text-sm font-medium truncate">{user?.name ?? "User"}</span>
+      <span className="text-sm font-medium truncate">{user?.name || "User"}</span>
     </div>
   );
 }

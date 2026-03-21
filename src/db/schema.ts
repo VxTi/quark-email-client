@@ -51,6 +51,20 @@ export const verification = pgTable("verification", {
   updatedAt: timestamp("updated_at"),
 });
 
+export const draft = pgTable("draft", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  to: text("to").notNull().default(""),
+  cc: text("cc").notNull().default(""),
+  bcc: text("bcc").notNull().default(""),
+  subject: text("subject").notNull().default(""),
+  body: text("body").notNull().default(""),
+  createdAt: timestamp("created_at").notNull(),
+  updatedAt: timestamp("updated_at").notNull(),
+});
+
 export const tag = pgTable("tag", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),

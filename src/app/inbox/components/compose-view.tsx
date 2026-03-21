@@ -1,20 +1,18 @@
 "use client";
 import { Field } from "@base-ui/react/field";
 import { XIcon } from "lucide-react";
-import { useState } from "react";
 import ResponseInputField from "@/app/inbox/components/reply-composer/response-input-field";
 import Button from "@/components/ui/button";
 
-interface Props {
-  onClose: () => void;
+export interface ComposeFormProps {
+  to: string; setTo: (v: string) => void;
+  cc: string; setCc: (v: string) => void;
+  bcc: string; setBcc: (v: string) => void;
+  subject: string; setSubject: (v: string) => void;
 }
 
-function useComposeForm() {
-  const [to, setTo] = useState("");
-  const [cc, setCc] = useState("");
-  const [bcc, setBcc] = useState("");
-  const [subject, setSubject] = useState("");
-  return { to, setTo, cc, setCc, bcc, setBcc, subject, setSubject };
+interface Props extends ComposeFormProps {
+  onClose: () => void;
 }
 
 function ComposeFieldRow({
@@ -50,16 +48,7 @@ function ComposeViewHeader({ onClose }: { onClose: () => void }) {
   );
 }
 
-function ComposeFormFields({
-  to,
-  setTo,
-  cc,
-  setCc,
-  bcc,
-  setBcc,
-  subject,
-  setSubject,
-}: ReturnType<typeof useComposeForm>) {
+function ComposeFormFields({ to, setTo, cc, setCc, bcc, setBcc, subject, setSubject }: ComposeFormProps) {
   return (
     <div className="shrink-0">
       <ComposeFieldRow label="To" value={to} onChange={setTo} />
@@ -70,8 +59,7 @@ function ComposeFormFields({
   );
 }
 
-export default function ComposeView({ onClose }: Props) {
-  const form = useComposeForm();
+export default function ComposeView({ onClose, ...form }: Props) {
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
       <ComposeViewHeader onClose={onClose} />
