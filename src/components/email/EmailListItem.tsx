@@ -13,7 +13,7 @@ function EmailMeta({ from, date }: { from: string; date: string }) {
 }
 
 export default function EmailListItem({ email, selected, onClick }: Props) {
-  const bg = selected ? "bg-zinc-100 border-l-2 border-l-accent" : "hover:bg-bg border-l-2 border-l-transparent";
+  const bg = selected ? "bg-surface border-l-2 border-l-accent" : "hover:bg-surface border-l-2 border-l-transparent";
   return (
     <button onClick={onClick} className={`w-full text-left px-4 py-3 border-b border-border transition-colors ${bg}`}>
       <EmailMeta from={email.from} date={email.date} />

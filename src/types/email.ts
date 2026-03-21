@@ -7,4 +7,5 @@ export interface Email {
   body: string;
   date: string;
   read: boolean;
+  attachments?: string[];
 }
