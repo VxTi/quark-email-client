@@ -1,11 +1,7 @@
 "use client";
 import Markdown from "react-markdown";
-import type { Email } from "@/types/email";
+import type { Email, EmailMessage } from "@/types/email";
 import ReplyComposer from "./reply-composer/ReplyComposer";
-
-interface Props {
-  email: Email;
-}
 
 function Attachment({ name }: { name: string }) {
   return (
@@ -16,31 +12,48 @@ function Attachment({ name }: { name: string }) {
   );
 }
 
-function EmailBubble({ email }: { email: Email }) {
+function AttachmentList({ attachments }: { attachments?: string[] }) {
+  if (!attachments?.length) return null;
   return (
-    <div className="flex flex-col items-start gap-1 max-w-[75%]">
-      <span className="text-xs text-muted-foreground px-1">
-        {email.from} · {email.date}
-      </span>
-      <div className="bg-muted rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-foreground leading-relaxed">
-        <Markdown>{email.body}</Markdown>
-      </div>
-      {email.attachments?.length ? (
-        <div className="flex flex-wrap gap-2 mt-1">
-          {email.attachments.map((a) => (
-            <Attachment key={a} name={a} />
-          ))}
-        </div>
-      ) : null}
+    <div className="flex flex-wrap gap-2 mt-1">
+      {attachments.map((a) => (
+        <Attachment key={a} name={a} />
+      ))}
     </div>
   );
 }
 
-export default function EmailViewerBody({ email }: Props) {
+function BubbleContent({ message }: { message: EmailMessage }) {
+  const style = message.isFromMe
+    ? "bg-primary text-primary-foreground rounded-2xl rounded-tr-sm"
+    : "bg-muted text-foreground rounded-2xl rounded-tl-sm";
+  return (
+    <div className={`${style} px-4 py-3 text-sm leading-relaxed`}>
+      <Markdown>{message.body}</Markdown>
+    </div>
+  );
+}
+
+function EmailBubble({ message }: { message: EmailMessage }) {
+  const align = message.isFromMe ? "self-end items-end" : "self-start items-start";
+  return (
+    <div className={`flex flex-col ${align} gap-1 max-w-[75%]`}>
+      <span className="text-xs text-muted-foreground px-1">
+        {message.from} · {message.date}
+      </span>
+      <BubbleContent message={message} />
+      <AttachmentList attachments={message.attachments} />
+    </div>
+  );
+}
+
+export default function EmailViewerBody({ email }: { email: Email }) {
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
-      <div className="flex-1 overflow-y-auto px-6 py-4">
-        <EmailBubble email={email} />
+      <div className="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-4">
+        {email.messages.map((m) => (
+          <EmailBubble key={m.id} message={m} />
+        ))}
       </div>
       <ReplyComposer />
     </div>
