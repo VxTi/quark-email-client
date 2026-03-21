@@ -1,9 +1,9 @@
 "use client";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
-import FormField from "@/components/ui/FormField";
+import { useState } from "react";
 import Button from "@/components/ui/Button";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { authClient } from "@/lib/auth-client";
 
 interface Props {
   email: string;
@@ -28,13 +28,30 @@ function useOtpForm(email: string) {
 }
 
 export default function OtpVerificationForm({ email }: Props) {
-  const { code, setCode, error, submit } = useOtpForm(email);
+  const { setCode, submit, code, error } = useOtpForm(email);
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
       <p className="text-muted-foreground text-sm text-center">
         We sent a code to <strong className="text-foreground">{email}</strong>.
       </p>
-      <FormField label="Verification code" value={code} onChange={setCode} error={error} />
+      <div>
+        <InputOTP
+          maxLength={6}
+          value={code}
+          onChange={(value) => setCode(value)}
+          className={error ? "border-destructive" : ""}
+        >
+          <InputOTPGroup className="w-full">
+            <InputOTPSlot index={0} />
+            <InputOTPSlot index={1} />
+            <InputOTPSlot index={2} />
+            <InputOTPSlot index={3} />
+            <InputOTPSlot index={4} />
+            <InputOTPSlot index={5} />
+          </InputOTPGroup>
+        </InputOTP>
+        {error && <p className="text-destructive text-sm mt-2">{error}</p>}
+      </div>
       <Button type="submit" className="w-full mt-2">
         Verify
       </Button>

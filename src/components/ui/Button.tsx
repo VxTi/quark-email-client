@@ -1,6 +1,6 @@
+import { cva, type VariantProps } from "class-variance-authority";
 import type React from "react";
 import type { ComponentProps } from "react";
-import { type VariantProps, cva } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 
 export const buttonVariants = cva(
@@ -12,7 +12,7 @@ export const buttonVariants = cva(
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "border border-border bg-transparent hover:bg-accent hover:text-accent-foreground",
         secondary: "bg-muted text-muted-foreground hover:bg-muted/80",
-        ghost: "bg-transparent hover:bg-accent hover:text-accent-foreground",
+        ghost: "bg-transparent hover:bg-accent hover:bg-accent-hover hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

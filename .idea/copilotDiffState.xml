@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="/route (snapshot).ts">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="/route (snapshot).ts" />
+              <option name="originalContent" value="import { eq } from &quot;drizzle-orm&quot;;&#10;import { NextResponse } from &quot;next/server&quot;;&#10;import { db } from &quot;@/db&quot;;&#10;import { tag } from &quot;@/db/schema&quot;;&#10;import { auth } from &quot;@/lib/auth&quot;;&#10;&#10;export async function GET() {&#10;  const session = await auth.api.getSession();&#10;  if (!session) return new NextResponse(&quot;Unauthorized&quot;, { status: 401 });&#10;&#10;  const tags = await db.select().from(tag).where(eq(tag.userId, session.user.id));&#10;&#10;  return NextResponse.json(tags);&#10;}&#10;&#10;export async function POST(req: Request) {&#10;  const session = await auth.api.getSession();&#10;  if (!session) return new NextResponse(&quot;Unauthorized&quot;, { status: 401 });&#10;&#10;  const { name, color } = await req.json();&#10;  const newTag = await db&#10;    .insert(tag)&#10;    .values({&#10;      id: crypto.randomUUID(),&#10;      name,&#10;      color: color ?? &quot;#E5E7EB&quot;,&#10;      userId: session.user.id,&#10;      createdAt: new Date(),&#10;    })&#10;    .returning();&#10;&#10;  return NextResponse.json(newTag[0]);&#10;}&#10;" />
+              <option name="updatedContent" value="import { eq } from &quot;drizzle-orm&quot;;&#10;import { headers } from &quot;next/headers&quot;;&#10;import { NextResponse } from &quot;next/server&quot;;&#10;import { db } from &quot;@/db&quot;;&#10;import { tag } from &quot;@/db/schema&quot;;&#10;import { auth } from &quot;@/lib/auth&quot;;&#10;&#10;export async function GET() {&#10;  const session = await auth.api.getSession({&#10;    headers: await headers(),&#10;  });&#10;  if (!session) return new NextResponse(&quot;Unauthorized&quot;, { status: 401 });&#10;&#10;  const tags = await db.select().from(tag).where(eq(tag.userId, session.user.id));&#10;&#10;  return NextResponse.json(tags);&#10;}&#10;&#10;export async function POST(req: Request) {&#10;  const session = await auth.api.getSession({&#10;    headers: await headers(),&#10;  });&#10;  if (!session) return new NextResponse(&quot;Unauthorized&quot;, { status: 401 });&#10;&#10;  const { name, color } = await req.json();&#10;  const newTag = await db&#10;    .insert(tag)&#10;    .values({&#10;      id: crypto.randomUUID(),&#10;      name,&#10;      color: color ?? &quot;#E5E7EB&quot;,&#10;      userId: session.user.id,&#10;      createdAt: new Date(),&#10;    })&#10;    .returning();&#10;&#10;  return NextResponse.json(newTag[0]);&#10;}" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

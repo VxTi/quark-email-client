@@ -1,5 +1,6 @@
 "use client";
-import type { Email } from "@/types/email";
+import type { Email, Tag } from "@/types/email";
+import { getContrastColor } from "@/lib/utils";
 
 interface Props {
   email: Email;
@@ -7,11 +8,34 @@ interface Props {
   onClick: () => void;
 }
 
-function EmailMeta({ from, date }: { from: string; date: string }) {
+function TagBadge({ tag }: { tag: Tag }) {
+  const fg = getContrastColor(tag.color);
   return (
-    <div className="flex justify-between items-center gap-2">
-      <span className="text-sm font-medium text-foreground truncate">{from}</span>
-      <span className="text-xs text-muted-foreground shrink-0">{date}</span>
+    <span
+      className="px-1.5 py-0.5 rounded-full text-[10px] font-medium"
+      style={{ backgroundColor: tag.color, color: fg }}
+    >
+      {tag.name}
+    </span>
+  );
+}
+
+function EmailMeta({ email }: { email: Email }) {
+  return (
+    <div className="flex justify-between items-start gap-2">
+      <div className="flex flex-col gap-1 min-w-0">
+        <span className="text-sm font-medium text-foreground truncate">
+          {email.from}
+        </span>
+        <div className="flex flex-wrap gap-1">
+          {email.tags.map((tag) => (
+            <TagBadge key={tag.name} tag={tag} />
+          ))}
+        </div>
+      </div>
+      <span className="text-xs text-muted-foreground shrink-0">
+        {email.date}
+      </span>
     </div>
   );
 }
@@ -26,13 +50,19 @@ export default function EmailListItem({ email, selected, onClick }: Props) {
       onClick={onClick}
       className={`w-full text-left px-4 py-3 border-b border-border transition-colors ${bg}`}
     >
-      <EmailMeta from={email.from} date={email.date} />
+      <EmailMeta email={email} />
       <p
-        className={`text-sm mt-1 truncate ${email.read ? "text-muted-foreground" : "font-semibold text-foreground"}`}
+        className={`text-sm mt-1 truncate ${
+          email.read
+            ? "text-muted-foreground"
+            : "font-semibold text-foreground"
+        }`}
       >
         {email.subject}
       </p>
-      <p className="text-xs text-muted-foreground mt-0.5 truncate">{email.preview}</p>
+      <p className="text-xs text-muted-foreground mt-0.5 truncate">
+        {email.preview}
+      </p>
     </button>
   );
 }

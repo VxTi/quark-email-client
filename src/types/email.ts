@@ -1,3 +1,8 @@
+export interface Tag {
+  name: string;
+  color: string;
+}
+
 export interface EmailMessage {
   id: string;
   from: string;
@@ -16,4 +21,5 @@ export interface Email {
   date: string;
   read: boolean;
   messages: EmailMessage[];
+  tags: Tag[];
 }
