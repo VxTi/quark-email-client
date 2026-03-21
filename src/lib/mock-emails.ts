@@ -10,6 +10,7 @@ export const mockEmails: Email[] = [
     body: "# Q1 Project Update\n\nHi,\n\nJust wanted to share the latest updates:\n\n- **Milestone 1** — completed ahead of schedule\n- **Milestone 2** — in progress, on track\n- **Milestone 3** — planning phase\n\nLet me know if you have any questions.\n\nBest,\nAlice",
     date: "Mar 21",
     read: false,
+    attachments: ["Q1_Report.pdf", "Project_Timeline.xlsx"],
   },
   {
     id: "2",
@@ -40,5 +41,6 @@ export const mockEmails: Email[] = [
     body: "# Design Feedback\n\nI reviewed the latest mockups. Overall they look great, but a few things:\n\n1. The sidebar width feels too narrow on mobile\n2. The email list item spacing could be more generous\n3. The yellow accent is subtle — I like it\n\nCan we sync this week?\n\nCarol",
     date: "Mar 18",
     read: false,
+    attachments: ["mockup_v3.fig", "feedback_notes.pdf"],
   },
 ];

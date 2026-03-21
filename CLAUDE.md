@@ -101,14 +101,20 @@ Interactive elements (inputs, dialogs, menus) must use **`@base-ui/react`** comp
 
 Defined in `globals.css` via Tailwind's `@theme`. **Always use these — never hardcode values.**
 
-| Token | Class | Purpose |
+| CSS Variable | Class | Purpose |
 |---|---|---|
-| `--color-bg` | `bg-bg` | Page background (warm white) |
-| `--color-surface` | `bg-surface` | Card / panel background |
-| `--color-border` | `border-border` | All borders |
-| `--color-accent` | `bg-accent` / `text-accent` | Yellow accent |
-| `--color-text` | `text-text` | Primary text |
-| `--color-text-muted` | `text-text-muted` | Secondary / placeholder text |
+| `--background` | `bg-background` | Page background (warm off-white) |
+| `--foreground` | `text-foreground` | Primary text |
+| `--card` | `bg-card` | Card / panel background |
+| `--card-foreground` | `text-card-foreground` | Text on card surfaces |
+| `--muted` | `bg-muted` | Subtle background (bubbles, chips) |
+| `--muted-foreground` | `text-muted-foreground` | Secondary / placeholder text |
+| `--border` | `border-border` | All borders |
+| `--primary` | `bg-primary` / `text-primary` | Primary action color (dark) |
+| `--primary-foreground` | `text-primary-foreground` | Text on primary background |
+| `--accent` | `bg-accent` | Subtle hover background |
+| `--accent-foreground` | `text-accent-foreground` | Text on accent background |
+| `--ring` | `ring-ring` | Focus ring color |
 
 ---
 

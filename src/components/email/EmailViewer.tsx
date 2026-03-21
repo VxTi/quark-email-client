@@ -6,7 +6,7 @@ interface Props { email: Email | null; }
 
 function EmptyState() {
   return (
-    <div className="flex-1 flex items-center justify-center text-text-muted text-sm">
+    <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
       Select an email to read
     </div>
   );

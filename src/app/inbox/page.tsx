@@ -9,7 +9,7 @@ import type { Email } from "@/types/email";
 export default function InboxPage() {
   const [selected, setSelected] = useState<Email | null>(null);
   return (
-    <div className="flex h-screen bg-bg overflow-hidden">
+    <div className="flex h-screen bg-background overflow-hidden">
       <Sidebar />
       <EmailList emails={mockEmails} selectedId={selected?.id} onSelect={setSelected} />
       <EmailViewer email={selected} />

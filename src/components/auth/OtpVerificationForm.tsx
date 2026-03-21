@@ -26,8 +26,8 @@ export default function OtpVerificationForm({ email }: Props) {
   const { code, setCode, error, submit } = useOtpForm(email);
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
-      <p className="text-text-muted text-sm text-center">
-        We sent a code to <strong className="text-text">{email}</strong>.
+      <p className="text-muted-foreground text-sm text-center">
+        We sent a code to <strong className="text-foreground">{email}</strong>.
       </p>
       <FormField label="Verification code" value={code} onChange={setCode} error={error} />
       <Button type="submit" className="w-full mt-2">Verify</Button>

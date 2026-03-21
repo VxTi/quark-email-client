@@ -1,17 +1,37 @@
 @import "tailwindcss";
 
+:root {
+  --background: 40 22% 97%;
+  --foreground: 40 8% 20%;
+  --card: 0 0% 100%;
+  --card-foreground: 40 8% 20%;
+  --muted: 60 3% 94%;
+  --muted-foreground: 40 2% 60%;
+  --border: 60 2% 91%;
+  --primary: 40 8% 20%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 60 3% 94%;
+  --accent-foreground: 40 8% 20%;
+  --ring: 40 8% 20%;
+}
+
 @theme {
-  --color-bg: #f9f9f7;
-  --color-surface: #ffffff;
-  --color-bubble: #ededeb;
-  --color-border: #e0ddd0;
-  --color-accent: #191919;
-  --color-text: #1a180f;
-  --color-text-muted: #706a52;
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-border: hsl(var(--border));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-ring: hsl(var(--ring));
 }
 
 body {
-  background-color: var(--color-bg);
-  color: var(--color-text);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
