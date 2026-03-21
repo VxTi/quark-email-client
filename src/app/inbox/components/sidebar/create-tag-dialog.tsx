@@ -28,21 +28,29 @@ function useCreateTagForm(onCreate: Props["onCreate"], onClose: Props["onClose"]
 function ActionButtons({ onClose, onCreate }: { onClose: () => void; onCreate: () => void }) {
   return (
     <div className="flex justify-end gap-2">
-      <Button variant="ghost" onClick={onClose}>Cancel</Button>
+      <Button variant="ghost" onClick={onClose}>
+        Cancel
+      </Button>
       <Button onClick={onCreate}>Create</Button>
     </div>
   );
 }
 
 export default function CreateTagForm({ onCreate, onClose }: Props) {
-  const { name, setName, h, setH, s, setS, l, setL, hexColor, handleCreate } = useCreateTagForm(onCreate, onClose);
+  const { name, setName, h, setH, s, setS, l, setL, hexColor, handleCreate } = useCreateTagForm(
+    onCreate,
+    onClose,
+  );
   return (
     <div className="flex flex-col gap-4">
       <p className="text-sm font-semibold text-foreground">Create a new tag</p>
       <InputField label="Tag Name" value={name} onChange={setName} placeholder="e.g. Work" />
       <div className="flex items-center gap-3">
         {/* dynamic hex color requires inline style */}
-        <div className="size-10 rounded-lg border border-border" style={{ backgroundColor: hexColor }} />
+        <div
+          className="size-10 rounded-lg border border-border"
+          style={{ backgroundColor: hexColor }}
+        />
         <span className="text-xs font-mono text-muted-foreground">{hexColor.toUpperCase()}</span>
       </div>
       <HSLWheelPicker h={h} s={s} l={l} setH={setH} setS={setS} setL={setL} />

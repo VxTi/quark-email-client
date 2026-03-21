@@ -25,7 +25,13 @@ export default function HSLWheelPicker({ h, s, l, setH, setS, setL }: HSLWheelPi
           <span>Lightness</span>
           <span>{l}%</span>
         </div>
-        <Slider.Root value={l} onValueChange={(v) => setL(v as number)} min={0} max={100} className="relative flex items-center h-5 w-full">
+        <Slider.Root
+          value={l}
+          onValueChange={(v) => setL(v as number)}
+          min={0}
+          max={100}
+          className="relative flex items-center h-5 w-full"
+        >
           <Slider.Track className="bg-muted h-1.5 w-full rounded-full relative">
             <Slider.Indicator className="absolute h-full bg-primary rounded-full" />
           </Slider.Track>

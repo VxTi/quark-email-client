@@ -170,4 +170,6 @@ Only add comments where the logic is **genuinely non-obvious**. Do not:
 
 ## 9. Additional information
 
-This project makes use of shadcn with base-ui and uses pnpm as package manager
+- This project makes use of shadcn with base-ui and uses pnpm as package manager.
+- When deciding to use unions of strings, prefer using enums, and const enums if possible.
+- Prefer using `cn` or `twMerge` instead of inlining classes when appending

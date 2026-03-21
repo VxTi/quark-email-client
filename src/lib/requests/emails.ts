@@ -1,3 +1,5 @@
+import type { InternalTag } from "@/types/email";
+
 export interface EmailData {
   to: string;
   cc: string;
@@ -5,7 +7,7 @@ export interface EmailData {
   subject: string;
   body?: string;
   tagId?: string;
-  internalTag?: "trash" | "draft" | "sent" | "inbox";
+  internalTag?: InternalTag;
 }
 
 export async function fetchEmails(): Promise<EmailData[]> {

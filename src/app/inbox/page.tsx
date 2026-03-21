@@ -6,6 +6,7 @@ import EmailViewer from "@/app/inbox/components/email-viewer";
 import SaveEmailDialog from "@/app/inbox/components/save-email-dialog";
 import Sidebar from "@/app/inbox/components/sidebar";
 import { useEmails } from "@/lib/email-context";
+import { InternalTag, type ActiveFilter } from "@/types/email";
 import { saveEmail } from "@/lib/requests/emails";
 import type { Email } from "@/types/email";
 
@@ -42,12 +43,24 @@ function useComposing(form: { isDirty: boolean; reset: () => void }) {
   return { composing, setComposing, pending, close, requestSelect };
 }
 
+function useFilter() {
+  const [filter, setFilter] = useState<ActiveFilter>(null);
+  return { filter, setFilter };
+}
+
 function useInboxState(form: ReturnType<typeof useComposeForm>) {
-  const { emails } = useEmails();
+  const { emails, deleteEmails } = useEmails();
   const [selected, setSelected] = useState<Email | null>(null);
   const comp = useComposing(form);
   const confirm = async (save: boolean) => {
-    if (save) await saveEmail({ to: form.to, cc: form.cc, bcc: form.bcc, subject: form.subject, internalTag: "draft" });
+    if (save)
+      await saveEmail({
+        to: form.to,
+        cc: form.cc,
+        bcc: form.bcc,
+        subject: form.subject,
+        internalTag: InternalTag.Draft,
+      });
     setSelected(comp.pending);
     comp.close();
   };
@@ -56,16 +69,23 @@ function useInboxState(form: ReturnType<typeof useComposeForm>) {
     setSelected(email);
     if (comp.composing) comp.close();
   };
-  return { emails, selected, ...comp, confirm, onSelect };
+  return { emails, selected, deleteEmails, ...comp, confirm, onSelect };
 }
 
 export default function InboxPage() {
   const form = useComposeForm();
   const state = useInboxState(form);
+  const { filter, setFilter } = useFilter();
   return (
     <div className="flex h-screen bg-background overflow-hidden">
-      <Sidebar onCompose={() => state.setComposing(true)} />
-      <EmailList emails={state.emails} selectedId={state.selected?.id} onSelect={state.onSelect} />
+      <Sidebar onCompose={() => state.setComposing(true)} filter={filter} onFilter={setFilter} />
+      <EmailList
+        emails={state.emails}
+        selectedId={state.selected?.id}
+        onSelect={state.onSelect}
+        onDelete={state.deleteEmails}
+        filter={filter}
+      />
       {state.composing ? (
         <ComposeView onClose={state.close} {...form} />
       ) : (

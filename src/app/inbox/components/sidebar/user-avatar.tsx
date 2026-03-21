@@ -2,7 +2,11 @@
 import { UserIcon } from "lucide-react";
 import Image from "next/image";
 
-export default function UserAvatar({ user }: { user?: { image?: string | null; name: string } | null }) {
+export default function UserAvatar({
+  user,
+}: {
+  user?: { image?: string | null; name: string } | null;
+}) {
   return (
     <div className="sidebar-text flex items-center gap-2 overflow-hidden *:size-4">
       {user?.image ? (
@@ -14,4 +18,3 @@ export default function UserAvatar({ user }: { user?: { image?: string | null; n
     </div>
   );
 }
-

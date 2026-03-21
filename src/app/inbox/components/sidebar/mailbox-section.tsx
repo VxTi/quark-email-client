@@ -1,28 +1,46 @@
 "use client";
-import { MessageCircleIcon, SendIcon, PenLineIcon, Trash2Icon, type LucideIcon } from "lucide-react";
+import {
+  type LucideIcon,
+  MessageCircleIcon,
+  PenLineIcon,
+  SendIcon,
+  Trash2Icon,
+} from "lucide-react";
+import { type ActiveFilter, InternalTag } from "@/types/email";
 import SidebarItem from "./sidebar-item";
 import SidebarSectionTitle from "./sidebar-section-title";
 
-type SidebarItemType = {
+type MailboxAction = {
   icon: LucideIcon;
   text: string;
+  value: InternalTag;
 };
 
-const SIDEBAR_ACTIONS: SidebarItemType[] = [
-  { icon: MessageCircleIcon, text: "Inbox" },
-  { icon: SendIcon, text: "Sent" },
-  { icon: PenLineIcon, text: "Drafts" },
-  { icon: Trash2Icon, text: "Trash" },
+const MAILBOX_ACTIONS: MailboxAction[] = [
+  { icon: MessageCircleIcon, text: "Inbox", value: InternalTag.Inbox },
+  { icon: SendIcon, text: "Sent", value: InternalTag.Sent },
+  { icon: PenLineIcon, text: "Drafts", value: InternalTag.Draft },
+  { icon: Trash2Icon, text: "Trash", value: InternalTag.Trash },
 ];
 
-export default function MailboxSection() {
+interface Props {
+  filter: ActiveFilter;
+  onFilter: (filter: ActiveFilter) => void;
+}
+
+export default function MailboxSection({ filter, onFilter }: Props) {
   return (
     <div className="flex flex-col gap-1">
       <SidebarSectionTitle title="Mailbox" />
-      {SIDEBAR_ACTIONS.map((action) => (
-        <SidebarItem key={action.text} {...action} onClick={() => {}} />
+      {MAILBOX_ACTIONS.map((action) => (
+        <SidebarItem
+          key={action.text}
+          icon={action.icon}
+          text={action.text}
+          active={filter?.kind === "mailbox" && filter.value === action.value}
+          onClick={() => onFilter({ kind: "mailbox", value: action.value })}
+        />
       ))}
     </div>
   );
 }
-

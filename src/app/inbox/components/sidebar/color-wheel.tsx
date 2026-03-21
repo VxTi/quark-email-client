@@ -61,7 +61,11 @@ export default function ColorWheel({ h, s, onColorChange }: ColorWheelProps) {
       <canvas ref={canvasRef} width={size} height={size} className="rounded-full" />
       <div
         className="absolute size-3 border-2 border-white rounded-full shadow-sm -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-        style={{ left: indicatorPos.x, top: indicatorPos.y, backgroundColor: `hsl(${h}, ${s}%, 50%)` }}
+        style={{
+          left: indicatorPos.x,
+          top: indicatorPos.y,
+          backgroundColor: `hsl(${h}, ${s}%, 50%)`,
+        }}
       />
     </div>
   );

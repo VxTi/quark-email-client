@@ -1,4 +1,12 @@
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { InternalTag } from "@/types/email";
+
+export const internalTagEnum = pgEnum("internal_tag", [
+  InternalTag.Inbox,
+  InternalTag.Sent,
+  InternalTag.Draft,
+  InternalTag.Trash,
+] as [InternalTag, ...InternalTag[]]);
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -57,7 +65,7 @@ export const email = pgTable("email", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   tagId: text("tag_id").references(() => tag.id, { onDelete: "set null" }),
-  internalTag: text("internal_tag").notNull().default("draft"), // e.g., trash, draft, sent, inbox
+  internalTag: internalTagEnum("internal_tag").notNull().default(InternalTag.Draft),
   to: text("to").notNull().default(""),
   cc: text("cc").notNull().default(""),
   bcc: text("bcc").notNull().default(""),

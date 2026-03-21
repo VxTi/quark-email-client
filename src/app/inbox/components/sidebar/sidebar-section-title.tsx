@@ -7,4 +7,3 @@ export default function SidebarSectionTitle({ title }: { title: string }) {
     </h2>
   );
 }
-

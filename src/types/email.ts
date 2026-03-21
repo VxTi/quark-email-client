@@ -1,7 +1,19 @@
+export enum InternalTag {
+  Inbox = "inbox",
+  Sent = "sent",
+  Draft = "draft",
+  Trash = "trash",
+}
+
 export interface Tag {
   name: string;
   color: string;
 }
+
+export type ActiveFilter =
+  | { kind: "mailbox"; value: InternalTag }
+  | { kind: "tag"; value: string }
+  | null;
 
 export interface EmailMessage {
   id: string;
@@ -26,5 +38,5 @@ export interface Email {
   messages: EmailMessage[];
   tags: Tag[];
   tagId?: string;
-  internalTag?: "trash" | "draft" | "sent" | "inbox";
+  internalTag?: InternalTag;
 }

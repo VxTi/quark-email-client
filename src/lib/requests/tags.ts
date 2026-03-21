@@ -15,4 +15,3 @@ export async function createTagRequest(name: string, color: string): Promise<Tag
   if (!res.ok) throw new Error("Failed to create tag");
   return res.json();
 }
-

@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { email } from "@/db/schema";
 import { auth } from "@/lib/auth";
+import { InternalTag } from "@/types/email";
 
 async function getSession() {
   return auth.api.getSession({ headers: await headers() });
@@ -16,7 +17,7 @@ async function insertEmail(userId: string, data: Record<string, string>) {
       id: crypto.randomUUID(),
       userId,
       tagId: data.tagId,
-      internalTag: data.internalTag as any ?? "draft",
+      internalTag: (data.internalTag as InternalTag) ?? InternalTag.Draft,
       to: data.to ?? "",
       cc: data.cc ?? "",
       bcc: data.bcc ?? "",

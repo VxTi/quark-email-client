@@ -6,7 +6,7 @@ import { EmailProvider } from "@/lib/email-context";
 import { TagProvider } from "@/lib/tag-context";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
-const figtree = Figtree({subsets:['latin'],variable:'--font-sans'});
+const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
 
 const geist = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 
