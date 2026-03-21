@@ -1,61 +1,52 @@
 "use client";
-import { Dialog } from "@base-ui/react/dialog";
 import { useState } from "react";
 import Button from "@/components/ui/button";
 import InputField from "@/components/ui/input-field";
 import { hslToHex } from "@/lib/color-utils";
 import HSLWheelPicker from "./hsl-wheel-picker";
 
-interface CreateLabelDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+interface Props {
   onCreate: (name: string, color: string) => void;
+  onClose: () => void;
 }
 
-export default function CreateTagDialog({ open, onOpenChange, onCreate }: CreateLabelDialogProps) {
+function useCreateTagForm(onCreate: Props["onCreate"], onClose: Props["onClose"]) {
   const [name, setName] = useState("");
   const [h, setH] = useState(200);
   const [s, setS] = useState(70);
   const [l, setL] = useState(50);
-
   const hexColor = hslToHex(h, s, l);
-
   const handleCreate = () => {
     if (!name) return;
     onCreate(name, hexColor);
     setName("");
-    onOpenChange(false);
+    onClose();
   };
+  return { name, setName, h, setH, s, setS, l, setL, hexColor, handleCreate };
+}
 
+function ActionButtons({ onClose, onCreate }: { onClose: () => void; onCreate: () => void }) {
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 bg-black/40" />
-        <Dialog.Popup className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card border border-border rounded-xl p-6 flex flex-col gap-4 shadow-lg w-80">
-          <Dialog.Title className="text-sm font-semibold text-foreground">
-            Create a new tag
-          </Dialog.Title>
-          <InputField label="Label Name" value={name} onChange={setName} placeholder="e.g. Work" />
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-3">
-              <div
-                className="size-10 rounded-lg border border-border"
-                style={{ backgroundColor: hexColor }}
-              />
-              <div className="text-xs font-mono text-muted-foreground">
-                {hexColor.toUpperCase()}
-              </div>
-            </div>
-            <HSLWheelPicker h={h} s={s} l={l} setH={setH} setS={setS} setL={setL} />
-          </div>
-          <div className="flex justify-end gap-2 mt-2">
-            <Button variant="ghost" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleCreate}>Create</Button>
-          </div>
-        </Dialog.Popup>
-      </Dialog.Portal>
-    </Dialog.Root>
+    <div className="flex justify-end gap-2">
+      <Button variant="ghost" onClick={onClose}>Cancel</Button>
+      <Button onClick={onCreate}>Create</Button>
+    </div>
+  );
+}
+
+export default function CreateTagForm({ onCreate, onClose }: Props) {
+  const { name, setName, h, setH, s, setS, l, setL, hexColor, handleCreate } = useCreateTagForm(onCreate, onClose);
+  return (
+    <div className="flex flex-col gap-4">
+      <p className="text-sm font-semibold text-foreground">Create a new tag</p>
+      <InputField label="Tag Name" value={name} onChange={setName} placeholder="e.g. Work" />
+      <div className="flex items-center gap-3">
+        {/* dynamic hex color requires inline style */}
+        <div className="size-10 rounded-lg border border-border" style={{ backgroundColor: hexColor }} />
+        <span className="text-xs font-mono text-muted-foreground">{hexColor.toUpperCase()}</span>
+      </div>
+      <HSLWheelPicker h={h} s={s} l={l} setH={setH} setS={setS} setL={setL} />
+      <ActionButtons onClose={onClose} onCreate={handleCreate} />
+    </div>
   );
 }
