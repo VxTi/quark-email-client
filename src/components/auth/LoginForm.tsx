@@ -12,7 +12,7 @@ function useEmailForm(onContinue: Props["onContinue"]) {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error: err } = await authClient.emailOTP.sendVerificationOtp({ email, type: "sign-in" });
+    const { error: err } = await authClient.emailOtp.sendVerificationOtp({ email, type: "sign-in" });
     if (err) { setError(err.message ?? "Failed to send code"); return; }
     onContinue(email);
   };
