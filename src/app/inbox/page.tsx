@@ -5,8 +5,8 @@ import EmailList from "@/app/inbox/components/email-list";
 import EmailViewer from "@/app/inbox/components/email-viewer";
 import SaveDraftDialog from "@/app/inbox/components/save-draft-dialog";
 import Sidebar from "@/app/inbox/components/sidebar";
-import { saveDraft } from "@/lib/requests/drafts";
 import { useEmails } from "@/lib/email-context";
+import { saveDraft } from "@/lib/requests/drafts";
 import type { Email } from "@/types/email";
 
 function useComposeForm() {
@@ -15,16 +15,28 @@ function useComposeForm() {
   const [bcc, setBcc] = useState("");
   const [subject, setSubject] = useState("");
   const isDirty = [to, cc, bcc, subject].some(Boolean);
-  const reset = () => { setTo(""); setCc(""); setBcc(""); setSubject(""); };
+  const reset = () => {
+    setTo("");
+    setCc("");
+    setBcc("");
+    setSubject("");
+  };
   return { to, setTo, cc, setCc, bcc, setBcc, subject, setSubject, isDirty, reset };
 }
 
 function useComposing(form: { isDirty: boolean; reset: () => void }) {
   const [composing, setComposing] = useState(false);
   const [pending, setPending] = useState<Email | null>(null);
-  const close = () => { setComposing(false); form.reset(); setPending(null); };
+  const close = () => {
+    setComposing(false);
+    form.reset();
+    setPending(null);
+  };
   const requestSelect = (email: Email) => {
-    if (composing && form.isDirty) { setPending(email); return true; }
+    if (composing && form.isDirty) {
+      setPending(email);
+      return true;
+    }
     return false;
   };
   return { composing, setComposing, pending, close, requestSelect };
@@ -54,9 +66,11 @@ export default function InboxPage() {
     <div className="flex h-screen bg-background overflow-hidden">
       <Sidebar onCompose={() => state.setComposing(true)} />
       <EmailList emails={state.emails} selectedId={state.selected?.id} onSelect={state.onSelect} />
-      {state.composing
-        ? <ComposeView onClose={state.close} {...form} />
-        : <EmailViewer email={state.selected} />}
+      {state.composing ? (
+        <ComposeView onClose={state.close} {...form} />
+      ) : (
+        <EmailViewer email={state.selected} />
+      )}
       <SaveDraftDialog open={!!state.pending} onConfirm={state.confirm} />
     </div>
   );

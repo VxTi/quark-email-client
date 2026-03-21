@@ -1,13 +1,13 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from "react";
+import { createTagRequest, fetchTags } from "@/lib/requests/tags";
 import type { Tag } from "@/types/email";
-import { fetchTags, createTagRequest } from "@/lib/requests/tags";
 
 interface TagContextType {
   tags: Tag[];
   isLoading: boolean;
-  createTag: (name: string, color?: string) => Promise<void>;
+  createTag: (name: string, color: string) => Promise<void>;
   refreshTags: () => Promise<void>;
 }
 
@@ -30,7 +30,7 @@ export function TagProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const createTag = useCallback(
-    async (name: string, color?: string) => {
+    async (name: string, color: string) => {
       try {
         await createTagRequest(name, color);
         await refreshTags();
@@ -38,7 +38,7 @@ export function TagProvider({ children }: { children: ReactNode }) {
         console.error(error);
       }
     },
-    [refreshTags]
+    [refreshTags],
   );
 
   useEffect(() => {

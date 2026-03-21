@@ -6,7 +6,7 @@ export async function fetchTags(): Promise<Tag[]> {
   return res.json();
 }
 
-export async function createTagRequest(name: string, color?: string): Promise<Tag> {
+export async function createTagRequest(name: string, color: string): Promise<Tag> {
   const res = await fetch("/api/tags", {
     method: "POST",
     body: JSON.stringify({ name, color }),
