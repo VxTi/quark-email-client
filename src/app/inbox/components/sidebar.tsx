@@ -47,12 +47,12 @@ function SidebarLabelGroup() {
   );
 }
 
-export default function Sidebar() {
+export default function Sidebar({ onCompose }: { onCompose: () => void }) {
   const { data: session } = authClient.useSession();
 
   return (
     <aside className="h-full flex flex-col border-r border-border bg-card p-3 gap-1 shrink-0">
-      <SidebarHeader user={session?.user} />
+      <SidebarHeader user={session?.user} onCompose={onCompose} />
       <SidebarSectionTitle title="Mailbox" />
       {SIDEBAR_ACTIONS.map((action) => (
         <SidebarItem key={action.text} {...action} onClick={() => {}} />
@@ -64,8 +64,10 @@ export default function Sidebar() {
 
 function SidebarHeader({
   user,
+  onCompose,
 }: {
   user?: { image?: string | null; name: string; email?: string } | null;
+  onCompose: () => void;
 }) {
   return (
     <div className="flex items-center justify-between min-h-10">
@@ -74,7 +76,7 @@ function SidebarHeader({
           <UserAvatar user={user} />
         </button>
       </UserProfilePopover>
-      <Button variant="ghost" size="icon">
+      <Button variant="ghost" size="icon" onClick={onCompose}>
         <SquarePenIcon className="size-4" />
       </Button>
     </div>
