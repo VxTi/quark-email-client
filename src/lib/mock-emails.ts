@@ -1,0 +1,44 @@
+import type { Email } from "@/types/email";
+
+export const mockEmails: Email[] = [
+  {
+    id: "1",
+    from: "alice@example.com",
+    to: "me@example.com",
+    subject: "Q1 Project Update",
+    preview: "Hi, just wanted to share the latest updates on the project…",
+    body: "# Q1 Project Update\n\nHi,\n\nJust wanted to share the latest updates:\n\n- **Milestone 1** — completed ahead of schedule\n- **Milestone 2** — in progress, on track\n- **Milestone 3** — planning phase\n\nLet me know if you have any questions.\n\nBest,\nAlice",
+    date: "Mar 21",
+    read: false,
+  },
+  {
+    id: "2",
+    from: "bob@example.com",
+    to: "me@example.com",
+    subject: "Lunch tomorrow?",
+    preview: "Are you free for lunch tomorrow around noon?",
+    body: "Hey,\n\nAre you free for lunch tomorrow around noon? Was thinking of trying the new place on 5th.\n\nLet me know!\n\nBob",
+    date: "Mar 20",
+    read: true,
+  },
+  {
+    id: "3",
+    from: "noreply@github.com",
+    to: "me@example.com",
+    subject: "[GitHub] Your pull request was merged",
+    preview: "Pull request #42 'feat: add email viewer' was merged into main.",
+    body: "## Pull Request Merged\n\nYour pull request **#42** `feat: add email viewer` was successfully merged into `main`.\n\n[View on GitHub →](https://github.com)",
+    date: "Mar 19",
+    read: true,
+  },
+  {
+    id: "4",
+    from: "carol@example.com",
+    to: "me@example.com",
+    subject: "Design feedback",
+    preview: "I reviewed the latest mockups — a few things I'd like to discuss.",
+    body: "# Design Feedback\n\nI reviewed the latest mockups. Overall they look great, but a few things:\n\n1. The sidebar width feels too narrow on mobile\n2. The email list item spacing could be more generous\n3. The yellow accent is subtle — I like it\n\nCan we sync this week?\n\nCarol",
+    date: "Mar 18",
+    read: false,
+  },
+];
