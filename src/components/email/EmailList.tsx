@@ -20,7 +20,12 @@ export default function EmailList({ emails, selectedId, onSelect }: Props) {
     <div className="w-80 h-full flex flex-col border-r border-border overflow-y-auto shrink-0">
       <EmailListHeader />
       {emails.map((email) => (
-        <EmailListItem key={email.id} email={email} selected={email.id === selectedId} onClick={() => onSelect(email)} />
+        <EmailListItem
+          key={email.id}
+          email={email}
+          selected={email.id === selectedId}
+          onClick={() => onSelect(email)}
+        />
       ))}
     </div>
   );

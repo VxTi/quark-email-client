@@ -7,7 +7,9 @@ import { useMemo, useRef, useState } from "react";
 import Toolbar from "@/components/email/reply-composer/Toolbar";
 import Button from "@/components/ui/Button";
 
-interface Attachment { name: string; }
+interface Attachment {
+  name: string;
+}
 
 interface FooterProps {
   fileRef: React.RefObject<HTMLInputElement | null>;
@@ -38,16 +40,30 @@ function AttachmentChip({ name, onRemove }: { name: string; onRemove: () => void
     <div className="flex items-center gap-1.5 px-2.5 py-1 bg-muted border border-border rounded-lg text-xs text-muted-foreground">
       <span>📎</span>
       <span className="truncate max-w-30">{name}</span>
-      <button type="button" onClick={onRemove} className="ml-0.5 leading-none hover:text-foreground cursor-pointer">×</button>
+      <button
+        type="button"
+        onClick={onRemove}
+        className="ml-0.5 leading-none hover:text-foreground cursor-pointer"
+      >
+        ×
+      </button>
     </div>
   );
 }
 
-function AttachmentList({ attachments, onRemove }: { attachments: Attachment[]; onRemove: (name: string) => void }) {
+function AttachmentList({
+  attachments,
+  onRemove,
+}: {
+  attachments: Attachment[];
+  onRemove: (name: string) => void;
+}) {
   if (!attachments.length) return null;
   return (
     <div className="flex flex-wrap gap-2">
-      {attachments.map((a) => <AttachmentChip key={a.name} name={a.name} onRemove={() => onRemove(a.name)} />)}
+      {attachments.map((a) => (
+        <AttachmentChip key={a.name} name={a.name} onRemove={() => onRemove(a.name)} />
+      ))}
     </div>
   );
 }
@@ -57,7 +73,9 @@ function ComposerFooter({ fileRef, onAttach, onFiles }: FooterProps) {
     <div className="flex items-center justify-between px-2 py-1.5 border-t border-border">
       <div className="flex">
         <input ref={fileRef} type="file" multiple className="hidden" onChange={onFiles} />
-        <Button variant="ghost" onClick={onAttach}>📎</Button>
+        <Button variant="ghost" onClick={onAttach}>
+          📎
+        </Button>
       </div>
       <Button>Send</Button>
     </div>

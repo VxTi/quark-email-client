@@ -1,18 +1,44 @@
 "use client";
-import { useState } from "react";
-import SidebarItem from "./SidebarItem";
 import Button from "@/components/ui/Button";
-
-const FOLDERS = ["Inbox", "Sent", "Drafts", "Trash"] as const;
+import { MessageCircleIcon, PanelLeftIcon, PanelRightIcon, PenLineIcon } from "lucide-react";
+import React, { useState }                                               from "react";
 
 export default function Sidebar() {
-  const [active, setActive] = useState("Inbox");
+  const [expanded, setExpanded] = useState(false);
+
+  const ExpansionIcon = expanded ? PanelLeftIcon : PanelRightIcon;
+
   return (
-    <aside className="w-52 h-full flex flex-col border-r border-border bg-card p-3 gap-1 shrink-0">
-      <Button className="mb-3 w-full justify-center">Compose</Button>
-      {FOLDERS.map((folder) => (
-        <SidebarItem key={folder} label={folder} active={active === folder} onClick={() => setActive(folder)} />
-      ))}
+    <aside
+      className="h-full flex flex-col border-r border-border bg-card p-3 gap-1 shrink-0"
+      data-expanded={expanded}
+    >
+      <Button variant="ghost" className='justify-start max-w-max' onClick={() => setExpanded(!expanded)} >
+        <ExpansionIcon />
+      </Button>
+      <SidebarItem icon={<MessageCircleIcon />} text="Messages" onClick={() => {}} />
+      <SidebarItem icon={<PenLineIcon />} text="Compose" onClick={() => {}} />
     </aside>
+  );
+}
+
+function SidebarItem({
+  icon,
+  text,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  text: string;
+  onClick: () => void;
+}) {
+  return (
+    <Button variant="ghost" onClick={onClick}>
+      <div className="flex items-center gap-2">
+        {icon}
+        <span className="sidebar-text whitespace-nowrap overflow-hidden opacity-0 w-0 transition-all [aside[data-expanded='true']_&]:opacity-100 [aside[data-expanded='true']_&]:w-auto">
+          {text}
+        </span>
+      </div>
+    </Button>
   );
 }

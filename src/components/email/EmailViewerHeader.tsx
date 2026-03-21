@@ -1,6 +1,8 @@
 import type { Email } from "@/types/email";
 
-interface Props { email: Email; }
+interface Props {
+  email: Email;
+}
 
 function MetaRow({ label, value }: { label: string; value: string }) {
   return (

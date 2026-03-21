@@ -22,7 +22,9 @@ function LoginHeader({ step }: { step: Step }) {
         {step === "email" ? "Welcome" : "Check your inbox"}
       </h1>
       <p className="text-muted-foreground mt-1 text-sm">
-        {step === "email" ? "Enter your email to sign in or register" : "Enter the code we sent you"}
+        {step === "email"
+          ? "Enter your email to sign in or register"
+          : "Enter the code we sent you"}
       </p>
     </div>
   );
@@ -34,9 +36,16 @@ export default function LoginPage() {
   return (
     <LoginCard>
       <LoginHeader step={step} />
-      {step === "email"
-        ? <LoginForm onContinue={(e) => { setEmail(e); setStep("otp"); }} />
-        : <OtpVerificationForm email={email} />}
+      {step === "email" ? (
+        <LoginForm
+          onContinue={(e) => {
+            setEmail(e);
+            setStep("otp");
+          }}
+        />
+      ) : (
+        <OtpVerificationForm email={email} />
+      )}
     </LoginCard>
   );
 }

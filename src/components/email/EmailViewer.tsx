@@ -2,7 +2,9 @@ import type { Email } from "@/types/email";
 import EmailViewerHeader from "./EmailViewerHeader";
 import EmailViewerBody from "./EmailViewerBody";
 
-interface Props { email: Email | null; }
+interface Props {
+  email: Email | null;
+}
 
 function EmptyState() {
   return (
