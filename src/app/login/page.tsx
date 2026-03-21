@@ -7,7 +7,7 @@ type Step = "email" | "otp";
 
 function LoginCard({ children }: { children: React.ReactNode }) {
   return (
-    <main className="min-h-screen bg-background flex items-center justify-center p-4">
+    <main className="min-h-screen bg-muted flex items-center justify-center p-4">
       <div className="w-full max-w-sm bg-card border border-border rounded-xl p-8 shadow-sm">
         {children}
       </div>
@@ -18,7 +18,7 @@ function LoginCard({ children }: { children: React.ReactNode }) {
 function LoginHeader({ step }: { step: Step }) {
   return (
     <div className="mb-8 text-center">
-      <h1 className="text-2xl font-bold text-foreground">
+      <h1 className="text-2xl font-medium text-foreground">
         {step === "email" ? "Welcome" : "Check your inbox"}
       </h1>
       <p className="text-muted-foreground mt-1 text-sm">

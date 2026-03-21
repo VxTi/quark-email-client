@@ -3,8 +3,8 @@ import { Dialog } from "@base-ui/react/dialog";
 import { useState } from "react";
 import Button from "@/components/ui/button";
 import InputField from "@/components/ui/input-field";
-import HSLWheelPicker from "./hsl-wheel-picker";
 import { hslToHex } from "@/lib/color-utils";
+import HSLWheelPicker from "./hsl-wheel-picker";
 
 interface CreateLabelDialogProps {
   open: boolean;
@@ -12,11 +12,7 @@ interface CreateLabelDialogProps {
   onCreate: (name: string, color: string) => void;
 }
 
-export default function CreateLabelDialog({
-  open,
-  onOpenChange,
-  onCreate,
-}: CreateLabelDialogProps) {
+export default function CreateTagDialog({ open, onOpenChange, onCreate }: CreateLabelDialogProps) {
   const [name, setName] = useState("");
   const [h, setH] = useState(200);
   const [s, setS] = useState(70);
@@ -42,8 +38,13 @@ export default function CreateLabelDialog({
           <InputField label="Label Name" value={name} onChange={setName} placeholder="e.g. Work" />
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-lg border border-border" style={{ backgroundColor: hexColor }} />
-              <div className="text-xs font-mono text-muted-foreground">{hexColor.toUpperCase()}</div>
+              <div
+                className="size-10 rounded-lg border border-border"
+                style={{ backgroundColor: hexColor }}
+              />
+              <div className="text-xs font-mono text-muted-foreground">
+                {hexColor.toUpperCase()}
+              </div>
             </div>
             <HSLWheelPicker h={h} s={s} l={l} setH={setH} setS={setS} setL={setL} />
           </div>

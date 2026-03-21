@@ -3,11 +3,11 @@ import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import Button from "@/components/ui/button";
 import { useTags } from "@/lib/tag-context";
-import CreateLabelDialog from "./create-label-dialog";
+import CreateTagDialog from "./create-tag-dialog";
 import SidebarItem from "./sidebar-item";
 import SidebarSectionTitle from "./sidebar-section-title";
 
-export default function LabelsSection() {
+export default function TagSection() {
   const { tags, createTag } = useTags();
   const [open, setOpen] = useState(false);
   const sortedTags = [...tags].sort((a, b) => a.name.localeCompare(b.name));
@@ -23,7 +23,7 @@ export default function LabelsSection() {
       {sortedTags.map((tag) => (
         <SidebarItem key={tag.name} color={tag.color} text={tag.name} onClick={() => {}} />
       ))}
-      <CreateLabelDialog open={open} onOpenChange={setOpen} onCreate={createTag} />
+      <CreateTagDialog open={open} onOpenChange={setOpen} onCreate={createTag} />
     </div>
   );
 }

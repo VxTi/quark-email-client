@@ -34,7 +34,7 @@ export default function OtpVerificationForm({ email }: Props) {
       <p className="text-muted-foreground text-sm text-center">
         We sent a code to <strong className="text-foreground">{email}</strong>.
       </p>
-      <div>
+      <div className="flex flex-col items-center">
         <InputOTP
           maxLength={6}
           value={code}
