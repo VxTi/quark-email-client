@@ -3,10 +3,10 @@ import { useState } from "react";
 import ComposeView from "@/app/inbox/components/compose-view";
 import EmailList from "@/app/inbox/components/email-list";
 import EmailViewer from "@/app/inbox/components/email-viewer";
-import SaveDraftDialog from "@/app/inbox/components/save-draft-dialog";
+import SaveEmailDialog from "@/app/inbox/components/save-email-dialog";
 import Sidebar from "@/app/inbox/components/sidebar";
 import { useEmails } from "@/lib/email-context";
-import { saveDraft } from "@/lib/requests/drafts";
+import { saveEmail } from "@/lib/requests/emails";
 import type { Email } from "@/types/email";
 
 function useComposeForm() {
@@ -47,7 +47,7 @@ function useInboxState(form: ReturnType<typeof useComposeForm>) {
   const [selected, setSelected] = useState<Email | null>(null);
   const comp = useComposing(form);
   const confirm = async (save: boolean) => {
-    if (save) await saveDraft({ to: form.to, cc: form.cc, bcc: form.bcc, subject: form.subject });
+    if (save) await saveEmail({ to: form.to, cc: form.cc, bcc: form.bcc, subject: form.subject, internalTag: "draft" });
     setSelected(comp.pending);
     comp.close();
   };
@@ -71,7 +71,7 @@ export default function InboxPage() {
       ) : (
         <EmailViewer email={state.selected} />
       )}
-      <SaveDraftDialog open={!!state.pending} onConfirm={state.confirm} />
+      <SaveEmailDialog open={!!state.pending} onConfirm={state.confirm} />
     </div>
   );
 }

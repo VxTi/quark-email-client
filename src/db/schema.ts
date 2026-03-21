@@ -51,11 +51,13 @@ export const verification = pgTable("verification", {
   updatedAt: timestamp("updated_at"),
 });
 
-export const draft = pgTable("draft", {
+export const email = pgTable("email", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  tagId: text("tag_id").references(() => tag.id, { onDelete: "set null" }),
+  internalTag: text("internal_tag").notNull().default("draft"), // e.g., trash, draft, sent, inbox
   to: text("to").notNull().default(""),
   cc: text("cc").notNull().default(""),
   bcc: text("bcc").notNull().default(""),

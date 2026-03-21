@@ -2,19 +2,21 @@ import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { draft } from "@/db/schema";
+import { email } from "@/db/schema";
 import { auth } from "@/lib/auth";
 
 async function getSession() {
   return auth.api.getSession({ headers: await headers() });
 }
 
-async function insertDraft(userId: string, data: Record<string, string>) {
+async function insertEmail(userId: string, data: Record<string, string>) {
   return db
-    .insert(draft)
+    .insert(email)
     .values({
       id: crypto.randomUUID(),
       userId,
+      tagId: data.tagId,
+      internalTag: data.internalTag as any ?? "draft",
       to: data.to ?? "",
       cc: data.cc ?? "",
       bcc: data.bcc ?? "",
@@ -29,14 +31,14 @@ async function insertDraft(userId: string, data: Record<string, string>) {
 export async function GET() {
   const session = await getSession();
   if (!session) return new NextResponse("Unauthorized", { status: 401 });
-  const drafts = await db.select().from(draft).where(eq(draft.userId, session.user.id));
-  return NextResponse.json(drafts);
+  const emails = await db.select().from(email).where(eq(email.userId, session.user.id));
+  return NextResponse.json(emails);
 }
 
 export async function POST(req: Request) {
   const session = await getSession();
   if (!session) return new NextResponse("Unauthorized", { status: 401 });
   const data = await req.json();
-  const [newDraft] = await insertDraft(session.user.id, data);
-  return NextResponse.json(newDraft);
+  const [newEmail] = await insertEmail(session.user.id, data);
+  return NextResponse.json(newEmail);
 }
