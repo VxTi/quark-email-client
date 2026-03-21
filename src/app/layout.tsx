@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { EmailProvider } from "@/lib/email-context";
 import { TagProvider } from "@/lib/tag-context";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const figtree = Figtree({subsets:['latin'],variable:'--font-sans'});
 
@@ -18,9 +19,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className={cn("font-sans", figtree.variable)}>
       <body className={`${geist.variable} antialiased`}>
-        <TagProvider>
-          <EmailProvider>{children}</EmailProvider>
-        </TagProvider>
+        <TooltipProvider>
+          <TagProvider>
+            <EmailProvider>{children}</EmailProvider>
+          </TagProvider>
+        </TooltipProvider>
       </body>
     </html>
   );

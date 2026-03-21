@@ -6,6 +6,9 @@ interface Props {
   email: Email;
   selected: boolean;
   onClick: () => void;
+  selectable?: boolean;
+  checked?: boolean;
+  onCheck?: () => void;
 }
 
 function TagBadge({ tag }: { tag: Tag }) {
@@ -36,25 +39,26 @@ function EmailMeta({ email }: { email: Email }) {
   );
 }
 
-export default function EmailListItem({ email, selected, onClick }: Props) {
-  const bg = selected
-    ? "bg-card border-l-2 border-l-primary"
-    : "hover:bg-card border-l-2 border-l-transparent";
+function SelectIndicator({ checked }: { checked: boolean }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`w-full text-left px-4 py-3 border-b border-border transition-colors ${bg}`}
-    >
-      <EmailMeta email={email} />
-      <p
-        className={`text-sm mt-1 truncate ${
-          email.read ? "text-muted-foreground" : "font-semibold text-foreground"
-        }`}
-      >
-        {email.subject}
-      </p>
-      <p className="text-xs text-muted-foreground mt-0.5 truncate">{email.preview}</p>
+    <div
+      className={`mt-0.5 size-4 rounded border-2 shrink-0 transition-colors ${
+        checked ? "bg-primary border-primary" : "border-border"
+      }`}
+    />
+  );
+}
+
+export default function EmailListItem({ email, selected, onClick, selectable, checked, onCheck }: Props) {
+  const bg = selected ? "bg-card border-l-2 border-l-primary" : "hover:bg-card border-l-2 border-l-transparent";
+  return (
+    <button type="button" onClick={selectable ? onCheck : onClick} className={`w-full text-left px-4 py-3 border-b border-border transition-colors flex items-start gap-3 ${bg}`}>
+      {selectable && <SelectIndicator checked={!!checked} />}
+      <div className="min-w-0 flex-1">
+        <EmailMeta email={email} />
+        <p className={`text-sm mt-1 truncate ${email.read ? "text-muted-foreground" : "font-semibold text-foreground"}`}>{email.subject}</p>
+        <p className="text-xs text-muted-foreground mt-0.5 truncate">{email.preview}</p>
+      </div>
     </button>
   );
 }
