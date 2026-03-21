@@ -17,10 +17,10 @@ export default function SidebarHeader({ user, onCompose }: SidebarHeaderProps) {
           <UserAvatar user={user} />
         </button>
       </UserProfilePopover>
-      <Button variant="ghost" size="icon" onClick={onCompose}>
+      <Button className="gap-2" onClick={onCompose}>
+        Create
         <SquarePenIcon className="size-4" />
       </Button>
     </div>
   );
 }
-
