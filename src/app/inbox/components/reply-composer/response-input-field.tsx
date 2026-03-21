@@ -4,8 +4,8 @@ import { defineBasicExtension } from "prosekit/basic";
 import { createEditor } from "prosekit/core";
 import { ProseKit } from "prosekit/react";
 import { useMemo, useRef, useState } from "react";
-import Toolbar from "@/components/email/reply-composer/Toolbar";
-import Button from "@/components/ui/Button";
+import ResponseInputToolbar from "@/app/inbox/components/reply-composer/response-input-toolbar";
+import Button from "@/components/ui/button";
 
 interface Attachment {
   name: string;
@@ -86,7 +86,7 @@ function ComposerInput({ editor, fileRef, onAttach, onFiles }: InputProps) {
   return (
     <div className="bg-card border border-border rounded-xl overflow-hidden flex flex-col">
       <ProseKit editor={editor}>
-        <Toolbar />
+        <ResponseInputToolbar />
         <div
           ref={editor.mount as React.Ref<HTMLDivElement>}
           className="px-3 py-2 min-h-[60px] max-h-[160px] overflow-y-auto text-sm text-foreground outline-none leading-relaxed"
@@ -97,7 +97,7 @@ function ComposerInput({ editor, fileRef, onAttach, onFiles }: InputProps) {
   );
 }
 
-export default function ReplyComposer() {
+export default function ResponseInputField() {
   const { editor, attachments, fileRef, onAttach, onFiles, remove } = useReplyComposer();
   return (
     <div className="border-t border-border px-4 py-3 shrink-0 flex flex-col gap-2 max-h-[280px]">

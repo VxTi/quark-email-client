@@ -3,7 +3,7 @@ import { Popover } from "@base-ui/react/popover";
 import { LogOutIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type * as React from "react";
-import Button from "@/components/ui/Button";
+import Button from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
 
 function useSignOut() {

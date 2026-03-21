@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
+import Button from "@/components/ui/button";
+import InputField from "@/components/ui/input-field";
 import { authClient } from "@/lib/auth-client";
-import FormField from "@/components/ui/FormField";
-import Button from "@/components/ui/Button";
 
 interface Props {
   onContinue: (email: string) => void;
@@ -32,7 +32,7 @@ export default function LoginForm({ onContinue }: Props) {
   const { email, setEmail, error, submit } = useEmailForm(onContinue);
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
-      <FormField
+      <InputField
         label="Email address"
         type="email"
         value={email}

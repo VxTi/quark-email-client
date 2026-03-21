@@ -3,15 +3,15 @@ import {
   type LucideIcon,
   MessageCircleIcon,
   PenLineIcon,
+  PlusIcon,
   SquarePenIcon,
+  TagIcon,
   Trash2Icon,
   UserIcon,
-  TagIcon,
-  PlusIcon,
 } from "lucide-react";
 import Image from "next/image";
-import UserProfilePopover from "@/components/email/UserProfilePopover";
-import Button from "@/components/ui/Button";
+import UserProfilePopover from "@/app/inbox/components/user-profile-popover";
+import Button from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
 import { useTags } from "@/lib/tag-context";
 

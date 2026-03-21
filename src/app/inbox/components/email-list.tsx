@@ -1,5 +1,5 @@
 import type { Email } from "@/types/email";
-import EmailListItem from "./EmailListItem";
+import EmailListItem from "./email-list-item";
 
 interface Props {
   emails: Email[];

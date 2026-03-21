@@ -1,7 +1,7 @@
 "use client";
 import Markdown from "react-markdown";
 import type { Email, EmailMessage } from "@/types/email";
-import ReplyComposer from "./reply-composer/ReplyComposer";
+import ResponseInputField from "./reply-composer/response-input-field";
 
 function Attachment({ name }: { name: string }) {
   return (
@@ -55,7 +55,7 @@ export default function EmailViewerBody({ email }: { email: Email }) {
           <EmailBubble key={m.id} message={m} />
         ))}
       </div>
-      <ReplyComposer />
+      <ResponseInputField />
     </div>
   );
 }

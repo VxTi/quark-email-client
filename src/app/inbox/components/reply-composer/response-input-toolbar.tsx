@@ -1,10 +1,10 @@
 "use client";
+import type { LucideIcon } from "lucide-react";
+import { Bold, Italic, List, ListOrdered, Redo2, Underline, Undo2 } from "lucide-react";
 import type { BasicExtension } from "prosekit/basic";
 import type { Editor } from "prosekit/core";
 import { useEditorDerivedValue } from "prosekit/react";
-import { Bold, Italic, List, ListOrdered, Redo2, Underline, Undo2 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import ToolbarButton from "./ToolbarButton";
+import ResponseInputToolbarButton from "./response-input-toolbar-button";
 
 type Ed = Editor<BasicExtension>;
 interface ToolItem {
@@ -90,18 +90,18 @@ function getItems(e: Ed): ToolItem[] {
 
 function ToolbarItem({ item }: { item: ToolItem }) {
   return (
-    <ToolbarButton
+    <ResponseInputToolbarButton
       pressed={item.active}
       disabled={!item.can}
       onClick={item.exec}
       tooltip={item.label}
     >
       <item.Icon size={15} />
-    </ToolbarButton>
+    </ResponseInputToolbarButton>
   );
 }
 
-export default function Toolbar() {
+export default function ResponseInputToolbar() {
   const items = useEditorDerivedValue(getItems);
   return (
     <div className="flex flex-wrap gap-0.5 px-2 py-1.5 border-b border-border">

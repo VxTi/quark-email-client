@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
-import Sidebar from "@/components/email/Sidebar";
-import EmailList from "@/components/email/EmailList";
-import EmailViewer from "@/components/email/EmailViewer";
+import EmailList from "@/app/inbox/components/email-list";
+import EmailViewer from "@/app/inbox/components/email-viewer";
+import Sidebar from "@/app/inbox/components/sidebar";
 import { useEmails } from "@/lib/email-context";
 import type { Email } from "@/types/email";
 

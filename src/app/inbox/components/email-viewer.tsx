@@ -1,6 +1,6 @@
 import type { Email } from "@/types/email";
-import EmailViewerHeader from "./EmailViewerHeader";
-import EmailViewerBody from "./EmailViewerBody";
+import EmailViewerBody from "./email-viewer-body";
+import EmailViewerHeader from "./email-viewer-header";
 
 interface Props {
   email: Email | null;

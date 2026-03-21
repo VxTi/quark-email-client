@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import LoginForm from "@/components/auth/LoginForm";
-import OtpVerificationForm from "@/components/auth/OtpVerificationForm";
+import LoginForm from "@/app/login/components/login-form";
+import OtpVerificationForm from "@/app/login/components/otp-verification-form";
 
 type Step = "email" | "otp";
 

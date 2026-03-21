@@ -3,8 +3,8 @@ import type { ImageExtension } from "prosekit/extensions/image";
 import { useEditor } from "prosekit/react";
 import { PopoverContent, PopoverRoot, PopoverTrigger } from "prosekit/react/popover";
 import { type ReactNode, useId, useState } from "react";
-import Button from "@/components/ui/Button";
-import ToolbarButton from "./ToolbarButton";
+import Button from "@/components/ui/button";
+import ResponseInputToolbarButton from "./response-input-toolbar-button";
 
 interface Props {
   uploader: Uploader<string>;
@@ -117,9 +117,9 @@ export default function ImageUploadPopover({ uploader, tooltip, disabled, childr
   return (
     <PopoverRoot open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger>
-        <ToolbarButton disabled={disabled} tooltip={tooltip}>
+        <ResponseInputToolbarButton disabled={disabled} tooltip={tooltip}>
           {children}
-        </ToolbarButton>
+        </ResponseInputToolbarButton>
       </PopoverTrigger>
       <ImagePopoverContent uploader={uploader} setOpen={setOpen} />
     </PopoverRoot>

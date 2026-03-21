@@ -17,7 +17,13 @@ function TooltipLabel({ text }: { text: string }) {
   );
 }
 
-export default function ToolbarButton({ pressed, disabled, onClick, tooltip, children }: Props) {
+export default function ResponseInputToolbarButton({
+  pressed,
+  disabled,
+  onClick,
+  tooltip,
+  children,
+}: Props) {
   return (
     <TooltipRoot>
       <TooltipTrigger className="block">

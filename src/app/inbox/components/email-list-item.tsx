@@ -1,6 +1,6 @@
 "use client";
-import type { Email, Tag } from "@/types/email";
 import { getContrastColor } from "@/lib/utils";
+import type { Email, Tag } from "@/types/email";
 
 interface Props {
   email: Email;
@@ -24,18 +24,14 @@ function EmailMeta({ email }: { email: Email }) {
   return (
     <div className="flex justify-between items-start gap-2">
       <div className="flex flex-col gap-1 min-w-0">
-        <span className="text-sm font-medium text-foreground truncate">
-          {email.from}
-        </span>
+        <span className="text-sm font-medium text-foreground truncate">{email.from}</span>
         <div className="flex flex-wrap gap-1">
           {email.tags.map((tag) => (
             <TagBadge key={tag.name} tag={tag} />
           ))}
         </div>
       </div>
-      <span className="text-xs text-muted-foreground shrink-0">
-        {email.date}
-      </span>
+      <span className="text-xs text-muted-foreground shrink-0">{email.date}</span>
     </div>
   );
 }
@@ -53,16 +49,12 @@ export default function EmailListItem({ email, selected, onClick }: Props) {
       <EmailMeta email={email} />
       <p
         className={`text-sm mt-1 truncate ${
-          email.read
-            ? "text-muted-foreground"
-            : "font-semibold text-foreground"
+          email.read ? "text-muted-foreground" : "font-semibold text-foreground"
         }`}
       >
         {email.subject}
       </p>
-      <p className="text-xs text-muted-foreground mt-0.5 truncate">
-        {email.preview}
-      </p>
+      <p className="text-xs text-muted-foreground mt-0.5 truncate">{email.preview}</p>
     </button>
   );
 }

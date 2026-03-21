@@ -9,7 +9,7 @@ interface Props {
   error?: string;
 }
 
-export default function FormField({ label, type = "text", value, onChange, error }: Props) {
+export default function InputField({ label, type = "text", value, onChange, error }: Props) {
   return (
     <Field.Root invalid={!!error} className="flex flex-col gap-1.5">
       <Field.Label className="text-sm font-medium text-foreground">{label}</Field.Label>
