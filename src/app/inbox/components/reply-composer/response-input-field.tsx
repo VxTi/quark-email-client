@@ -1,5 +1,6 @@
 "use client";
 import "prosekit/basic/style.css";
+import { SendIcon } from "lucide-react";
 import { defineBasicExtension } from "prosekit/basic";
 import { createEditor } from "prosekit/core";
 import { ProseKit } from "prosekit/react";
@@ -77,7 +78,10 @@ function ComposerFooter({ fileRef, onAttach, onFiles }: FooterProps) {
           📎
         </Button>
       </div>
-      <Button>Send</Button>
+      <Button className="gap-2">
+        Send
+        <SendIcon className="size-4" />
+      </Button>
     </div>
   );
 }
@@ -100,7 +104,7 @@ function ComposerInput({ editor, fileRef, onAttach, onFiles }: InputProps) {
 export default function ResponseInputField() {
   const { editor, attachments, fileRef, onAttach, onFiles, remove } = useReplyComposer();
   return (
-    <div className="border-t border-border px-4 py-3 shrink-0 flex flex-col gap-2 max-h-70">
+    <div className="border-border px-4 py-3 shrink-0 flex flex-col gap-2 max-h-70">
       <AttachmentList attachments={attachments} onRemove={remove} />
       <ComposerInput editor={editor} fileRef={fileRef} onAttach={onAttach} onFiles={onFiles} />
     </div>

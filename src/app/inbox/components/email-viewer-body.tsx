@@ -106,7 +106,7 @@ function EmailBubble({ message }: { message: EmailMessage }) {
 
 export default function EmailViewerBody({ email }: { email: Email }) {
   return (
-    <div className="flex flex-col flex-1 overflow-hidden">
+    <div className="flex flex-col flex-1 overflow-hidden max-w-5xl mx-auto w-full">
       <motion.div
         key={email.id}
         variants={containerVariants}

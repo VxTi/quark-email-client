@@ -21,7 +21,7 @@ import { type ActiveFilter, type Email, InternalTag, type Tag } from "@/types/em
 import EmailListItem from "./email-list-item";
 
 export const EMAIL_LIST_DEFAULT_WIDTH = 250;
-export const EMAIL_LIST_MAX_WIDTH = 500;
+export const EMAIL_LIST_MAX_WIDTH = 600;
 const EMAIL_LIST_COLLAPSE_THRESHOLD = 180;
 
 interface Props {
