@@ -42,11 +42,10 @@ export default function CreateTagForm({ onCreate, onClose }: Props) {
     onClose,
   );
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 p-4">
       <p className="text-sm font-semibold text-foreground">Create a new tag</p>
       <InputField label="Tag Name" value={name} onChange={setName} placeholder="e.g. Work" />
       <div className="flex items-center gap-3">
-        {/* dynamic hex color requires inline style */}
         <div
           className="size-10 rounded-lg border border-border"
           style={{ backgroundColor: hexColor }}

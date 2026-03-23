@@ -1,4 +1,5 @@
 "use client";
+import { motion } from "framer-motion";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { buttonVariants } from "@/components/ui/button";
@@ -18,9 +19,22 @@ function TagHeader({ onCreate }: { onCreate: (name: string, color: string) => vo
         <PopoverTrigger className={buttonVariants({ variant: "ghost", size: "icon" })}>
           <PlusIcon className="size-3" />
         </PopoverTrigger>
-        <PopoverContent side="right" align="start" className="w-80">
-          <CreateTagForm onCreate={onCreate} onClose={() => setOpen(false)} />
-        </PopoverContent>
+        <PopoverContent
+          side="right"
+          align="start"
+          className="w-80"
+          render={
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.2 }}
+              style={{ transformOrigin: "top left" }}
+            >
+              <CreateTagForm onCreate={onCreate} onClose={() => setOpen(false)} />
+            </motion.div>
+          }
+        ></PopoverContent>
       </Popover>
     </div>
   );

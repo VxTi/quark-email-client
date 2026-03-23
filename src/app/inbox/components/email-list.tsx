@@ -1,8 +1,8 @@
 "use client";
 import { Field } from "@base-ui/react/field";
-import { CheckSquare, Search, Trash2, X } from "lucide-react";
+import { CheckSquare, ChevronRight, Search, Trash2, X } from "lucide-react";
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Button from "@/components/ui/button";
 import {
   ContextMenu,
@@ -17,8 +17,12 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useEmails } from "@/lib/email-context";
 import { useTags } from "@/lib/tag-context";
-import { InternalTag, type ActiveFilter, type Email, type Tag } from "@/types/email";
+import { type ActiveFilter, type Email, InternalTag, type Tag } from "@/types/email";
 import EmailListItem from "./email-list-item";
+
+export const EMAIL_LIST_DEFAULT_WIDTH = 250;
+export const EMAIL_LIST_MAX_WIDTH = 500;
+const EMAIL_LIST_COLLAPSE_THRESHOLD = 180;
 
 interface Props {
   emails: Email[];
@@ -26,6 +30,11 @@ interface Props {
   onSelect: (email: Email) => void;
   onDelete?: (ids: string[]) => void;
   filter?: ActiveFilter;
+}
+
+interface ResizableProps extends Props {
+  width: number;
+  onHandleMouseDown: (e: React.MouseEvent) => void;
 }
 
 interface SearchBarProps {
@@ -79,6 +88,78 @@ function applyFilters(emails: Email[], filter: ActiveFilter, query: string): Ema
       `${e.from} ${e.subject} ${e.preview}`.toLowerCase().includes(query.toLowerCase()),
     );
   return result;
+}
+
+function useDragListeners(
+  dragging: React.MutableRefObject<boolean>,
+  startX: React.MutableRefObject<number>,
+  startWidth: React.MutableRefObject<number>,
+  setWidth: (w: number) => void,
+) {
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      if (!dragging.current) return;
+      const next = Math.min(
+        EMAIL_LIST_MAX_WIDTH,
+        Math.max(0, startWidth.current + e.clientX - startX.current),
+      );
+      setWidth(next);
+    };
+    const onUp = () => {
+      dragging.current = false;
+    };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+    return () => {
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    };
+  }, [dragging, startX, startWidth, setWidth]);
+}
+
+function useResizableWidth() {
+  const [width, setWidth] = useState(EMAIL_LIST_DEFAULT_WIDTH);
+  const dragging = useRef(false);
+  const startX = useRef(0);
+  const startWidth = useRef(0);
+  useDragListeners(dragging, startX, startWidth, setWidth);
+  const onMouseDown = (e: React.MouseEvent) => {
+    dragging.current = true;
+    startX.current = e.clientX;
+    startWidth.current = width;
+    e.preventDefault();
+  };
+  return {
+    width,
+    onMouseDown,
+    collapsed: width < EMAIL_LIST_COLLAPSE_THRESHOLD,
+    expand: () => setWidth(EMAIL_LIST_DEFAULT_WIDTH),
+  };
+}
+
+function ResizeHandle({ onMouseDown }: { onMouseDown: (e: React.MouseEvent) => void }) {
+  return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: it's fine
+    <div
+      onMouseDown={onMouseDown}
+      className="absolute right-0 top-0 h-full w-1 cursor-col-resize hover:bg-border transition-colors z-10"
+    />
+  );
+}
+
+function CollapseButton({ onClick }: { onClick: () => void }) {
+  return (
+    <div className="relative h-full w-0 shrink-0">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onClick}
+        className="absolute left-0 top-1/2 -translate-y-1/2 z-50 h-10 w-5 rounded-l-none rounded-r-md border border-l-0 border-border bg-card hover:bg-accent"
+      >
+        <ChevronRight className="size-4" />
+      </Button>
+    </div>
+  );
 }
 
 function useEmailListState() {
@@ -170,11 +251,12 @@ function SearchBar({ query, onChange, onClose }: SearchBarProps) {
           render={
             <input
               placeholder="Search..."
+              // biome-ignore lint/a11y/noAutofocus: It's fine
               autoFocus
               value={query}
               onChange={(e) => onChange(e.target.value)}
             />
-          } // biome-ignore lint/a11y/noAutofocus: It's fine
+          }
           className="w-full bg-transparent text-sm outline-none text-foreground placeholder:text-muted-foreground"
         />
       </Field.Root>
@@ -290,13 +372,16 @@ function EmailListBody({
   );
 }
 
-export default function EmailList({
+// Dynamic px width cannot be expressed with Tailwind utility classes
+function EmailListContent({
   emails,
   selectedId,
   onSelect,
   onDelete,
   filter = null,
-}: Props) {
+  width,
+  onHandleMouseDown,
+}: ResizableProps) {
   const state = useEmailListState();
   const filtered = applyFilters(emails, filter ?? null, state.query);
   const headerProps = useHeaderProps(state, onDelete, filter ?? null);
@@ -305,7 +390,10 @@ export default function EmailList({
     state.setQuery("");
   };
   return (
-    <div className="w-80 h-full flex flex-col border-r border-border shrink-0">
+    <div
+      className="relative h-full flex flex-col border-r border-border shrink-0"
+      style={{ width }}
+    >
       <EmailListHeader {...headerProps} />
       {state.searching && (
         <SearchBar query={state.query} onChange={state.setQuery} onClose={closeSearch} />
@@ -319,6 +407,13 @@ export default function EmailList({
         selectedIds={state.selectedIds}
         toggleId={state.toggleId}
       />
+      <ResizeHandle onMouseDown={onHandleMouseDown} />
     </div>
   );
+}
+
+export default function EmailList(props: Props) {
+  const { width, onMouseDown, collapsed, expand } = useResizableWidth();
+  if (collapsed) return <CollapseButton onClick={expand} />;
+  return <EmailListContent {...props} width={width} onHandleMouseDown={onMouseDown} />;
 }
