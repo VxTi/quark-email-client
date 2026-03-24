@@ -18,7 +18,14 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   const data = (await req.json()) as DraftData;
   const [updated] = await db
     .update(email)
-    .set({ to: data.to ?? "", cc: data.cc ?? "", bcc: data.bcc ?? "", subject: data.subject ?? "", body: data.body ?? "", updatedAt: new Date() })
+    .set({
+      to: data.to ?? "",
+      cc: data.cc ?? "",
+      bcc: data.bcc ?? "",
+      subject: data.subject ?? "",
+      body: data.body ?? "",
+      updatedAt: new Date(),
+    })
     .where(and(eq(email.id, id), eq(email.userId, session.user.id)))
     .returning();
   if (!updated) return new NextResponse("Not found", { status: 404 });

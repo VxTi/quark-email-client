@@ -11,7 +11,10 @@ function usePasskeySetup(onComplete: () => void) {
   const [error, setError] = useState("");
   const setup = async () => {
     const { error: err } = await authClient.passkey.addPasskey();
-    if (err) { setError((err as { message?: string }).message ?? "Failed to set up passkey"); return; }
+    if (err) {
+      setError((err as { message?: string }).message ?? "Failed to set up passkey");
+      return;
+    }
     onComplete();
   };
   return { setup, error };

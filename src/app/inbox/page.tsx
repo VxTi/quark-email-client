@@ -56,7 +56,13 @@ function useConfirmSave(
   const { addEmail } = useEmails();
   return async (save: boolean) => {
     if (save) {
-      const saved = await saveEmail({ to: form.to, cc: form.cc, bcc: form.bcc, subject: form.subject, internalTag: InternalTag.Draft });
+      const saved = await saveEmail({
+        to: form.to,
+        cc: form.cc,
+        bcc: form.bcc,
+        subject: form.subject,
+        internalTag: InternalTag.Draft,
+      });
       addEmail(saved);
     }
     setSelected(comp.pending);

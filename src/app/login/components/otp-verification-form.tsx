@@ -15,7 +15,10 @@ function useOtpForm(email: string, onSuccess: () => void) {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const { error: err } = await authClient.signIn.emailOtp({ email, otp: code });
-    if (err) { setError(err.message ?? "Invalid code"); return; }
+    if (err) {
+      setError(err.message ?? "Invalid code");
+      return;
+    }
     onSuccess();
   };
   return { code, setCode, error, submit };

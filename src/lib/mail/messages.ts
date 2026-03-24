@@ -34,7 +34,12 @@ function buildFromValues(msg: FetchedMessage) {
   };
 }
 
-function buildEmailValues(userId: string, accountId: string, folderId: string, msg: FetchedMessage) {
+function buildEmailValues(
+  userId: string,
+  accountId: string,
+  folderId: string,
+  msg: FetchedMessage,
+) {
   return {
     id: crypto.randomUUID(),
     userId,
@@ -74,11 +79,18 @@ export async function fetchEnvelopes(
   await withImapClient(creds, async (client) => {
     const status = await client.mailboxOpen(folderPath);
     const seq = `${Math.max(1, status.exists - 49)}:*`;
-    for await (const msg of client.fetch(seq, { uid: true, envelope: true, flags: true, bodyStructure: true })) {
+    for await (const msg of client.fetch(seq, {
+      uid: true,
+      envelope: true,
+      flags: true,
+      bodyStructure: true,
+    })) {
       msgs.push(msg as FetchedMessage);
     }
   });
-  return Promise.all(msgs.map((m) => upsertMessage(buildEmailValues(userId, accountId, folderId, m))));
+  return Promise.all(
+    msgs.map((m) => upsertMessage(buildEmailValues(userId, accountId, folderId, m))),
+  );
 }
 
 export async function getMessages(folderId: string) {
@@ -86,7 +98,10 @@ export async function getMessages(folderId: string) {
 }
 
 export async function getMessageById(id: string, userId: string) {
-  const [msg] = await db.select().from(email).where(and(eq(email.id, id), eq(email.userId, userId)));
+  const [msg] = await db
+    .select()
+    .from(email)
+    .where(and(eq(email.id, id), eq(email.userId, userId)));
   return msg ?? null;
 }
 
@@ -103,11 +118,19 @@ export async function fetchMessageBody(uid: string, creds: ImapCredentials, fold
   return { bodyHtml, bodyText };
 }
 
-export async function ensureBodyLoaded(msg: Email, creds: ImapCredentials, folderPath: string): Promise<Email> {
+export async function ensureBodyLoaded(
+  msg: Email,
+  creds: ImapCredentials,
+  folderPath: string,
+): Promise<Email> {
   if (msg.bodyHtml || msg.bodyText || !msg.uid) return msg;
   const { bodyHtml, bodyText } = await fetchMessageBody(msg.uid, creds, folderPath);
   const preview = bodyText.slice(0, 150);
-  const [updated] = await db.update(email).set({ bodyHtml, bodyText, preview, updatedAt: new Date() }).where(eq(email.id, msg.id)).returning();
+  const [updated] = await db
+    .update(email)
+    .set({ bodyHtml, bodyText, preview, updatedAt: new Date() })
+    .where(eq(email.id, msg.id))
+    .returning();
   return updated ?? msg;
 }
 

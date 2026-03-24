@@ -32,6 +32,9 @@ export async function POST(req: Request) {
   const session = await getSession();
   if (!session) return new NextResponse("Unauthorized", { status: 401 });
   const data = (await req.json()) as DraftData;
-  const [draft] = await db.insert(email).values(buildDraftValues(session.user.id, data)).returning();
+  const [draft] = await db
+    .insert(email)
+    .values(buildDraftValues(session.user.id, data))
+    .returning();
   return NextResponse.json(draft, { status: 201 });
 }

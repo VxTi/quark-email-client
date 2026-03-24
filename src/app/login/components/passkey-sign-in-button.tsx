@@ -9,7 +9,10 @@ function usePasskeySignIn() {
   const [error, setError] = useState("");
   const signIn = async () => {
     const { error: err } = await authClient.signIn.passkey();
-    if (err) { setError((err as { message?: string }).message ?? "Passkey sign-in failed"); return; }
+    if (err) {
+      setError((err as { message?: string }).message ?? "Passkey sign-in failed");
+      return;
+    }
     router.push("/inbox");
   };
   return { signIn, error };

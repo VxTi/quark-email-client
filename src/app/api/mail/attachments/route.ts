@@ -24,7 +24,14 @@ async function stageAttachment(file: File) {
   await writeFile(storageKey, Buffer.from(await file.arrayBuffer()));
   const [row] = await db
     .insert(attachment)
-    .values({ id: crypto.randomUUID(), filename: file.name, contentType: file.type, size: file.size, storageKey, createdAt: new Date() })
+    .values({
+      id: crypto.randomUUID(),
+      filename: file.name,
+      contentType: file.type,
+      size: file.size,
+      storageKey,
+      createdAt: new Date(),
+    })
     .returning();
   return row;
 }

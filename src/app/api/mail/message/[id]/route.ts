@@ -12,7 +12,10 @@ async function getSession() {
 async function loadMessage(id: string, userId: string) {
   const msg = await getMessageById(id, userId);
   if (!msg?.uid || !msg.folderId || !msg.accountId) return msg;
-  const [account, folder] = await Promise.all([getMailAccountById(msg.accountId), getFolderById(msg.folderId)]);
+  const [account, folder] = await Promise.all([
+    getMailAccountById(msg.accountId),
+    getFolderById(msg.folderId),
+  ]);
   if (!account || !folder) return msg;
   return ensureBodyLoaded(msg, account, folder.path);
 }

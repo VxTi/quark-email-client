@@ -29,7 +29,10 @@ async function upsertFolder(accountId: string, mb: MailboxInfo) {
   const [row] = await db
     .insert(folder)
     .values(values)
-    .onConflictDoUpdate({ target: [folder.accountId, folder.path], set: { name: mb.name, updatedAt: new Date() } })
+    .onConflictDoUpdate({
+      target: [folder.accountId, folder.path],
+      set: { name: mb.name, updatedAt: new Date() },
+    })
     .returning();
   return row;
 }

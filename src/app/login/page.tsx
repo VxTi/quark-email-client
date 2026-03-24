@@ -67,14 +67,17 @@ export default function LoginPage() {
     <LoginCard>
       <LoginHeader step={step} />
       {step === "email" && (
-        <EmailStep onContinue={(e) => { setEmail(e); setStep("otp"); }} />
+        <EmailStep
+          onContinue={(e) => {
+            setEmail(e);
+            setStep("otp");
+          }}
+        />
       )}
       {step === "otp" && (
         <OtpVerificationForm email={email} onSuccess={() => setStep("passkey-setup")} />
       )}
-      {step === "passkey-setup" && (
-        <PasskeySetupForm onComplete={() => router.push("/inbox")} />
-      )}
+      {step === "passkey-setup" && <PasskeySetupForm onComplete={() => router.push("/inbox")} />}
     </LoginCard>
   );
 }
