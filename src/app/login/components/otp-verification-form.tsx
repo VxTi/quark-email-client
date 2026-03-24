@@ -1,5 +1,4 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Button from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
@@ -7,28 +6,23 @@ import { authClient } from "@/lib/auth-client";
 
 interface Props {
   email: string;
+  onSuccess: () => void;
 }
 
-function useOtpForm(email: string) {
+function useOtpForm(email: string, onSuccess: () => void) {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
-  const router = useRouter();
-
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const { error: err } = await authClient.signIn.emailOtp({ email, otp: code });
-    if (err) {
-      setError(err.message ?? "Invalid code");
-      return;
-    }
-    router.push("/inbox");
+    if (err) { setError(err.message ?? "Invalid code"); return; }
+    onSuccess();
   };
-
   return { code, setCode, error, submit };
 }
 
-export default function OtpVerificationForm({ email }: Props) {
-  const { setCode, submit, code, error } = useOtpForm(email);
+export default function OtpVerificationForm({ email, onSuccess }: Props) {
+  const { setCode, submit, code, error } = useOtpForm(email, onSuccess);
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
       <p className="text-muted-foreground text-sm text-center">

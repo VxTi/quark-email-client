@@ -1,5 +1,5 @@
-import { boolean, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
-import { InternalTag } from "@/types/email";
+import { boolean, integer, pgEnum, pgTable, text, timestamp, unique } from "drizzle-orm/pg-core";
+import { FolderType, InternalTag } from "@/types/email";
 
 export const internalTagEnum = pgEnum("internal_tag", [
   InternalTag.Inbox,
@@ -7,6 +7,16 @@ export const internalTagEnum = pgEnum("internal_tag", [
   InternalTag.Draft,
   InternalTag.Trash,
 ] as [InternalTag, ...InternalTag[]]);
+
+export const folderTypeEnum = pgEnum("folder_type", [
+  FolderType.Inbox,
+  FolderType.Sent,
+  FolderType.Drafts,
+  FolderType.Trash,
+  FolderType.Spam,
+  FolderType.Archive,
+  FolderType.Custom,
+] as [FolderType, ...FolderType[]]);
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -59,20 +69,20 @@ export const verification = pgTable("verification", {
   updatedAt: timestamp("updated_at"),
 });
 
-export const email = pgTable("email", {
+export const passkey = pgTable("passkey", {
   id: text("id").primaryKey(),
+  name: text("name"),
+  publicKey: text("public_key").notNull(),
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  tagId: text("tag_id").references(() => tag.id, { onDelete: "set null" }),
-  internalTag: internalTagEnum("internal_tag").notNull().default(InternalTag.Draft),
-  to: text("to").notNull().default(""),
-  cc: text("cc").notNull().default(""),
-  bcc: text("bcc").notNull().default(""),
-  subject: text("subject").notNull().default(""),
-  body: text("body").notNull().default(""),
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
+  credentialId: text("credential_id").notNull().unique(),
+  counter: integer("counter").notNull().default(0),
+  deviceType: text("device_type").notNull(),
+  backedUp: boolean("backed_up").notNull(),
+  transports: text("transports"),
+  aaguid: text("aaguid"),
+  createdAt: timestamp("created_at"),
 });
 
 export const tag = pgTable("tag", {
@@ -84,3 +94,93 @@ export const tag = pgTable("tag", {
     .references(() => user.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").notNull(),
 });
+
+export const mailAccount = pgTable("mail_account", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  displayName: text("display_name").notNull().default(""),
+  email: text("email").notNull(),
+  imapHost: text("imap_host").notNull(),
+  imapPort: integer("imap_port").notNull(),
+  imapSecure: boolean("imap_secure").notNull().default(true),
+  smtpHost: text("smtp_host").notNull(),
+  smtpPort: integer("smtp_port").notNull(),
+  smtpSecure: boolean("smtp_secure").notNull().default(true),
+  encryptedPassword: text("encrypted_password"),
+  encryptedAccessToken: text("encrypted_access_token"),
+  encryptedRefreshToken: text("encrypted_refresh_token"),
+  tokenExpiresAt: timestamp("token_expires_at"),
+  createdAt: timestamp("created_at").notNull(),
+  updatedAt: timestamp("updated_at").notNull(),
+});
+
+export const folder = pgTable(
+  "folder",
+  {
+    id: text("id").primaryKey(),
+    accountId: text("account_id")
+      .notNull()
+      .references(() => mailAccount.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    path: text("path").notNull(),
+    type: folderTypeEnum("type").notNull().default(FolderType.Custom),
+    uidValidity: text("uid_validity"),
+    uidNext: text("uid_next"),
+    totalMessages: integer("total_messages").notNull().default(0),
+    unreadMessages: integer("unread_messages").notNull().default(0),
+    updatedAt: timestamp("updated_at").notNull(),
+  },
+  (t) => [unique("folder_account_path_unq").on(t.accountId, t.path)],
+);
+
+export const email = pgTable(
+  "email",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    accountId: text("account_id").references(() => mailAccount.id, { onDelete: "cascade" }),
+    folderId: text("folder_id").references(() => folder.id, { onDelete: "set null" }),
+    tagId: text("tag_id").references(() => tag.id, { onDelete: "set null" }),
+    internalTag: internalTagEnum("internal_tag").notNull().default(InternalTag.Draft),
+    uid: text("uid"),
+    messageId: text("message_id"),
+    fromAddress: text("from_address").notNull().default(""),
+    fromName: text("from_name").notNull().default(""),
+    to: text("to").notNull().default(""),
+    cc: text("cc").notNull().default(""),
+    bcc: text("bcc").notNull().default(""),
+    subject: text("subject").notNull().default(""),
+    preview: text("preview").notNull().default(""),
+    body: text("body").notNull().default(""),
+    bodyHtml: text("body_html"),
+    bodyText: text("body_text"),
+    read: boolean("read").notNull().default(false),
+    starred: boolean("starred").notNull().default(false),
+    hasAttachments: boolean("has_attachments").notNull().default(false),
+    flags: text("flags"),
+    date: timestamp("date"),
+    createdAt: timestamp("created_at").notNull(),
+    updatedAt: timestamp("updated_at").notNull(),
+  },
+  (t) => [unique("email_folder_uid_unq").on(t.folderId, t.uid)],
+);
+
+export const attachment = pgTable("attachment", {
+  id: text("id").primaryKey(),
+  emailId: text("email_id").references(() => email.id, { onDelete: "cascade" }),
+  filename: text("filename").notNull(),
+  contentType: text("content_type").notNull(),
+  size: integer("size").notNull(),
+  contentId: text("content_id"),
+  storageKey: text("storage_key").notNull(),
+  createdAt: timestamp("created_at").notNull(),
+});
+
+export type MailAccount = typeof mailAccount.$inferSelect;
+export type Folder = typeof folder.$inferSelect;
+export type Email = typeof email.$inferSelect;
+export type Attachment = typeof attachment.$inferSelect;

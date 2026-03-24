@@ -5,6 +5,16 @@ export enum InternalTag {
   Trash = "trash",
 }
 
+export enum FolderType {
+  Inbox = "inbox",
+  Sent = "sent",
+  Drafts = "drafts",
+  Trash = "trash",
+  Spam = "spam",
+  Archive = "archive",
+  Custom = "custom",
+}
+
 export interface Tag {
   name: string;
   color: string;

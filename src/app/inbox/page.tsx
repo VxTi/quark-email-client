@@ -48,22 +48,27 @@ function useFilter() {
   return { filter, setFilter };
 }
 
+function useConfirmSave(
+  form: ReturnType<typeof useComposeForm>,
+  comp: ReturnType<typeof useComposing>,
+  setSelected: (e: Email | null) => void,
+) {
+  const { addEmail } = useEmails();
+  return async (save: boolean) => {
+    if (save) {
+      const saved = await saveEmail({ to: form.to, cc: form.cc, bcc: form.bcc, subject: form.subject, internalTag: InternalTag.Draft });
+      addEmail(saved);
+    }
+    setSelected(comp.pending);
+    comp.close();
+  };
+}
+
 function useInboxState(form: ReturnType<typeof useComposeForm>) {
   const { emails, deleteEmails } = useEmails();
   const [selected, setSelected] = useState<Email | null>(null);
   const comp = useComposing(form);
-  const confirm = async (save: boolean) => {
-    if (save)
-      await saveEmail({
-        to: form.to,
-        cc: form.cc,
-        bcc: form.bcc,
-        subject: form.subject,
-        internalTag: InternalTag.Draft,
-      });
-    setSelected(comp.pending);
-    comp.close();
-  };
+  const confirm = useConfirmSave(form, comp, setSelected);
   const onSelect = (email: Email) => {
     if (comp.requestSelect(email)) return;
     setSelected(email);
