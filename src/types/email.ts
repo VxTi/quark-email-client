@@ -1,18 +1,18 @@
 export enum InternalTag {
-  Inbox = "inbox",
-  Sent = "sent",
-  Draft = "draft",
-  Trash = "trash",
+  Inbox = 'inbox',
+  Sent = 'sent',
+  Draft = 'draft',
+  Trash = 'trash',
 }
 
 export enum FolderType {
-  Inbox = "inbox",
-  Sent = "sent",
-  Drafts = "drafts",
-  Trash = "trash",
-  Spam = "spam",
-  Archive = "archive",
-  Custom = "custom",
+  Inbox = 'inbox',
+  Sent = 'sent',
+  Drafts = 'drafts',
+  Trash = 'trash',
+  Spam = 'spam',
+  Archive = 'archive',
+  Custom = 'custom',
 }
 
 export interface Tag {
@@ -21,8 +21,8 @@ export interface Tag {
 }
 
 export type ActiveFilter =
-  | { kind: "mailbox"; value: InternalTag }
-  | { kind: "tag"; value: string }
+  | { kind: 'mailbox'; value: InternalTag }
+  | { kind: 'tag'; value: string }
   | null;
 
 export interface EmailMessage {

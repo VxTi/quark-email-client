@@ -1,9 +1,15 @@
-"use client";
-import { Field } from "@base-ui/react/field";
-import { CheckSquare, ChevronRight, Search, Trash2, X } from "lucide-react";
-import type React from "react";
-import { useEffect, useRef, useState } from "react";
-import Button from "@/components/ui/button";
+'use client';
+import { Field } from '@base-ui/react/field';
+import {
+  CheckSquare,
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  Trash2,
+  X,
+} from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import Button from '@/components/ui/button';
 import {
   ContextMenu,
   ContextMenuContent,
@@ -13,12 +19,17 @@ import {
   ContextMenuSubContent,
   ContextMenuSubTrigger,
   ContextMenuTrigger,
-} from "@/components/ui/context-menu";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useEmails } from "@/lib/email-context";
-import { useTags } from "@/lib/tag-context";
-import { type ActiveFilter, type Email, InternalTag, type Tag } from "@/types/email";
-import EmailListItem from "./email-list-item";
+} from '@/components/ui/context-menu';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { useEmails } from '@/lib/email-context';
+import { useTags } from '@/lib/tag-context';
+import type { ActiveFilter, Email, Tag } from '@/types/email';
+import { EmailListProvider, useEmailList } from './email-list-context';
+import EmailListItem from './email-list-item';
 
 export const EMAIL_LIST_DEFAULT_WIDTH = 250;
 export const EMAIL_LIST_MAX_WIDTH = 600;
@@ -35,84 +46,32 @@ interface Props {
 interface ResizableProps extends Props {
   width: number;
   onHandleMouseDown: (e: React.MouseEvent) => void;
-}
-
-interface SearchBarProps {
-  query: string;
-  onChange: (q: string) => void;
-  onClose: () => void;
-}
-
-interface ActionBarProps {
-  selectMode: boolean;
-  canDelete: boolean;
-  onToggleSelect: () => void;
-  onDelete: () => void;
-  onSearch: () => void;
-}
-
-interface HeaderProps extends ActionBarProps {
-  title: string;
-}
-
-interface BodyProps {
-  emails: Email[];
-  selectedId?: string;
-  onSelect: (email: Email) => void;
-  onDelete?: (ids: string[]) => void;
-  selectMode: boolean;
-  selectedIds: Set<string>;
-  toggleId: (id: string) => void;
-}
-
-const MAILBOX_LABELS: Record<InternalTag, string> = {
-  [InternalTag.Inbox]: "Inbox",
-  [InternalTag.Sent]: "Sent",
-  [InternalTag.Draft]: "Drafts",
-  [InternalTag.Trash]: "Trash",
-};
-
-function filterTitle(filter: ActiveFilter): string {
-  if (!filter) return "Inbox";
-  if (filter.kind === "mailbox") return MAILBOX_LABELS[filter.value];
-  return filter.value;
-}
-
-function applyFilters(emails: Email[], filter: ActiveFilter, query: string): Email[] {
-  let result = emails;
-  if (filter?.kind === "mailbox") result = result.filter((e) => e.internalTag === filter.value);
-  if (filter?.kind === "tag")
-    result = result.filter((e) => e.tags.some((t) => t.name === filter.value));
-  if (query)
-    result = result.filter((e) =>
-      `${e.from} ${e.subject} ${e.preview}`.toLowerCase().includes(query.toLowerCase()),
-    );
-  return result;
+  onCollapse: () => void;
 }
 
 function useDragListeners(
   dragging: React.RefObject<boolean>,
   startX: React.RefObject<number>,
   startWidth: React.RefObject<number>,
-  setWidth: (w: number) => void,
-) {
+  setWidth: (w: number) => void
+): void {
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
       if (!dragging.current) return;
       const next = Math.min(
         EMAIL_LIST_MAX_WIDTH,
-        Math.max(0, startWidth.current + e.clientX - startX.current),
+        Math.max(0, startWidth.current + e.clientX - startX.current)
       );
       setWidth(next);
     };
     const onUp = () => {
       dragging.current = false;
     };
-    document.addEventListener("mousemove", onMove);
-    document.addEventListener("mouseup", onUp);
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
     return () => {
-      document.removeEventListener("mousemove", onMove);
-      document.removeEventListener("mouseup", onUp);
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
     };
   }, [dragging, startX, startWidth, setWidth]);
 }
@@ -133,27 +92,37 @@ function useResizableWidth() {
     width,
     onMouseDown,
     collapsed: width < EMAIL_LIST_COLLAPSE_THRESHOLD,
-    expand: () => setWidth(EMAIL_LIST_DEFAULT_WIDTH),
+    expand: () => {
+      setWidth(EMAIL_LIST_DEFAULT_WIDTH);
+    },
+    collapse: () => {
+      setWidth(0);
+    },
   };
 }
 
-function ResizeHandle({ onMouseDown }: { onMouseDown: (e: React.MouseEvent) => void }) {
+function ResizeHandle({
+  onMouseDown,
+}: {
+  onMouseDown: (e: React.MouseEvent) => void;
+}) {
   return (
     <div
       onMouseDown={onMouseDown}
-      className="absolute right-0 top-0 h-full w-1 cursor-col-resize hover:bg-border transition-colors z-10"
+      className="hover:bg-border absolute top-0 right-0 z-10 h-full w-1 cursor-col-resize transition-colors"
     />
   );
 }
 
-function CollapseButton({ onClick }: { onClick: () => void }) {
+function ExpansionButton({ onClick }: { onClick: () => void }) {
   return (
     <div className="relative h-full w-0 shrink-0">
       <Button
+        title="Expand"
         variant="ghost"
         size="icon"
         onClick={onClick}
-        className="absolute left-0 top-1/2 -translate-y-1/2 z-50 h-10 w-5 rounded-l-none rounded-r-md border border-l-0 border-border bg-card hover:bg-accent"
+        className="border-border bg-card hover:bg-accent absolute top-1/2 left-0 z-50 h-10 w-5 -translate-y-1/2 rounded-l-none rounded-r-md border-2 border-l-0"
       >
         <ChevronRight className="size-4" />
       </Button>
@@ -161,56 +130,18 @@ function CollapseButton({ onClick }: { onClick: () => void }) {
   );
 }
 
-function useEmailListState() {
-  const [selectMode, setSelectMode] = useState(false);
-  const [selectedIds, setSelectedIds] = useState(new Set<string>());
-  const [searching, setSearching] = useState(false);
-  const [query, setQuery] = useState("");
-  const toggleId = (id: string) =>
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  const exitSelect = () => {
-    setSelectMode(false);
-    setSelectedIds(new Set());
-  };
-  const toggleSelect = () => (selectMode ? exitSelect() : setSelectMode(true));
-  return {
-    selectMode,
-    toggleSelect,
-    exitSelect,
-    selectedIds,
-    toggleId,
-    searching,
-    setSearching,
-    query,
-    setQuery,
-  };
-}
-
-function useHeaderProps(
-  state: ReturnType<typeof useEmailListState>,
-  onDelete: ((ids: string[]) => void) | undefined,
-  filter: ActiveFilter,
-) {
-  return {
-    title: filterTitle(filter ?? null),
-    selectMode: state.selectMode,
-    canDelete: state.selectedIds.size > 0,
-    onToggleSelect: state.toggleSelect,
-    onDelete: () => {
-      onDelete?.([...state.selectedIds]);
-      state.exitSelect();
-    },
-    onSearch: () => state.setSearching(true),
-  };
+function CollapseButton({ onClick }: { onClick: () => void }) {
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={onClick}
+      title="Collapse"
+      className="border-border bg-card hover:bg-accent absolute top-1/2 -right-0.5 z-50 h-10 w-5 -translate-y-1/2 rounded-l-md rounded-r-none border-2 border-r-0"
+    >
+      <ChevronLeft className="size-4" />
+    </Button>
+  );
 }
 
 function TooltipButton({
@@ -246,10 +177,11 @@ function TooltipButton({
   );
 }
 
-function SearchBar({ query, onChange, onClose }: SearchBarProps) {
+function SearchBar() {
+  const { query, setQuery, closeSearch } = useEmailList();
   return (
-    <div className="px-3 py-2 border-b-2 border-border flex items-center gap-2 shrink-0">
-      <Search className="size-4 text-muted-foreground shrink-0" />
+    <div className="border-border flex shrink-0 items-center gap-2 border-b-2 px-3 py-2">
+      <Search className="text-muted-foreground size-4 shrink-0" />
       <Field.Root className="flex-1">
         <Field.Control
           render={
@@ -258,52 +190,58 @@ function SearchBar({ query, onChange, onClose }: SearchBarProps) {
               // biome-ignore lint/a11y/noAutofocus: It's fine
               autoFocus
               value={query}
-              onChange={(e) => onChange(e.target.value)}
+              onChange={e => {
+                setQuery(e.target.value);
+              }}
             />
           }
-          className="w-full bg-transparent text-sm outline-none text-foreground placeholder:text-muted-foreground"
+          className="text-foreground placeholder:text-muted-foreground w-full bg-transparent text-sm outline-none"
         />
       </Field.Root>
-      <Button variant="ghost" size="icon" onClick={onClose}>
+      <Button variant="ghost" size="icon" onClick={closeSearch}>
         <X className="size-4" />
       </Button>
     </div>
   );
 }
 
-function HeaderActions({
-  selectMode,
-  canDelete,
-  onToggleSelect,
-  onDelete,
-  onSearch,
-}: ActionBarProps) {
+function HeaderActions() {
+  const { selectMode, toggleSelect, selectedIds, deleteSelected, openSearch } =
+    useEmailList();
   return (
     <div className="flex gap-0.5">
-      <TooltipButton label="Search" onClick={onSearch}>
+      <TooltipButton label="Search" onClick={openSearch}>
         <Search className="size-4" />
       </TooltipButton>
       <TooltipButton
         label="Select"
-        onClick={onToggleSelect}
-        className={selectMode ? "bg-accent" : ""}
+        onClick={toggleSelect}
+        className={selectMode ? 'bg-accent' : ''}
+        disabled={selectedIds.size === 0}
       >
         <CheckSquare className="size-4" />
       </TooltipButton>
-      <TooltipButton label="Delete selected" onClick={onDelete} disabled={!canDelete}>
+      <TooltipButton
+        label="Delete selected"
+        onClick={deleteSelected}
+        disabled={selectedIds.size === 0}
+      >
         <Trash2 className="size-4" />
       </TooltipButton>
     </div>
   );
 }
 
-function EmailListHeader({ title, ...actions }: HeaderProps) {
+function EmailListHeader() {
+  const { title } = useEmailList();
   return (
-    <div className="px-4 py-2.5 border-b-2 border-border shrink-0 flex items-center justify-between">
-      <div className="flex-1 min-w-0">
-        <h2 className="font-semibold text-foreground text-sm truncate">{title}</h2>
+    <div className="border-border flex h-14 shrink-0 items-center justify-between border-b-2 px-4 py-2.5">
+      <div className="min-w-0 flex-1">
+        <h2 className="text-foreground truncate text-sm font-semibold">
+          {title}
+        </h2>
       </div>
-      <HeaderActions {...actions} />
+      <HeaderActions />
     </div>
   );
 }
@@ -311,15 +249,26 @@ function EmailListHeader({ title, ...actions }: HeaderProps) {
 function TagSubmenu({ email }: { email: Email }) {
   const { tags } = useTags();
   const { updateEmailTags } = useEmails();
-  const available = tags.filter((t) => !email.tags.some((et) => et.name === t.name));
-  const addTag = (tag: Tag) => updateEmailTags(email.id, [...email.tags, tag]);
+  const available = tags.filter(
+    t => !email.tags.some(et => et.name === t.name)
+  );
+  const addTag = (tag: Tag) => {
+    updateEmailTags(email.id, [...email.tags, tag]);
+  };
   return (
     <ContextMenuSub>
       <ContextMenuSubTrigger>Add Tag</ContextMenuSubTrigger>
       <ContextMenuSubContent>
-        {available.length === 0 && <ContextMenuItem disabled>No tags available</ContextMenuItem>}
-        {available.map((tag) => (
-          <ContextMenuItem key={tag.name} onClick={() => addTag(tag)}>
+        {available.length === 0 && (
+          <ContextMenuItem disabled>No tags available</ContextMenuItem>
+        )}
+        {available.map(tag => (
+          <ContextMenuItem
+            key={tag.name}
+            onClick={() => {
+              addTag(tag);
+            }}
+          >
             {tag.name}
           </ContextMenuItem>
         ))}
@@ -343,7 +292,10 @@ function EmailItemMenu({
       <ContextMenuContent>
         <TagSubmenu email={email} />
         <ContextMenuSeparator />
-        <ContextMenuItem onClick={onDelete} className="text-destructive focus:text-destructive">
+        <ContextMenuItem
+          onClick={onDelete}
+          className="text-destructive focus:text-destructive"
+        >
           Delete
         </ContextMenuItem>
       </ContextMenuContent>
@@ -351,31 +303,40 @@ function EmailItemMenu({
   );
 }
 
-function EmailListBody({
-  emails,
-  selectedId,
-  onSelect,
-  onDelete,
-  selectMode,
-  selectedIds,
-  toggleId,
-}: BodyProps) {
+function EmailListBody() {
+  const {
+    filteredEmails,
+    selectedId,
+    onSelect,
+    onDeleteEmails,
+    selectMode,
+    selectedIds,
+    toggleId,
+  } = useEmailList();
   return (
-    <div className="overflow-y-auto flex-1">
-      {emails.map((e) => (
-        <EmailItemMenu key={e.id} email={e} onDelete={() => onDelete?.([e.id])}>
+    <div className="flex-1 overflow-y-auto">
+      {filteredEmails.map(e => (
+        <EmailItemMenu
+          key={e.id}
+          email={e}
+          onDelete={() => onDeleteEmails?.([e.id])}
+        >
           <EmailListItem
             email={e}
             selected={e.id === selectedId}
-            onClick={() => onSelect(e)}
+            onClick={() => {
+              onSelect(e);
+            }}
             selectable={selectMode}
             checked={selectedIds.has(e.id)}
-            onCheck={() => toggleId(e.id)}
+            onCheck={() => {
+              toggleId(e.id);
+            }}
           />
         </EmailItemMenu>
       ))}
-      {emails.length === 0 && (
-        <div className="flex items-center justify-center pt-6 text-sm text-muted-foreground max-w-3/4 mx-auto">
+      {filteredEmails.length === 0 && (
+        <div className="text-muted-foreground mx-auto flex max-w-3/4 items-center justify-center pt-6 text-sm">
           It seems there are no emails to be found here.
         </div>
       )}
@@ -383,48 +344,70 @@ function EmailListBody({
   );
 }
 
-// Dynamic px width cannot be expressed with Tailwind utility classes
 function EmailListContent({
-  emails,
-  selectedId,
-  onSelect,
-  onDelete,
-  filter = null,
   width,
   onHandleMouseDown,
-}: ResizableProps) {
-  const state = useEmailListState();
-  const filtered = applyFilters(emails, filter ?? null, state.query);
-  const headerProps = useHeaderProps(state, onDelete, filter ?? null);
-  const closeSearch = () => {
-    state.setSearching(false);
-    state.setQuery("");
-  };
+  onCollapse,
+}: {
+  width: number;
+  onHandleMouseDown: (e: React.MouseEvent) => void;
+  onCollapse: () => void;
+}) {
+  const { searching } = useEmailList();
   return (
     <div
-      className="relative h-full flex flex-col border-r-2 border-border shrink-0"
+      className="border-border relative flex h-full shrink-0 flex-col border-r-2"
       style={{ width }}
     >
-      <EmailListHeader {...headerProps} />
-      {state.searching && (
-        <SearchBar query={state.query} onChange={state.setQuery} onClose={closeSearch} />
-      )}
-      <EmailListBody
-        emails={filtered}
-        selectedId={selectedId}
-        onSelect={onSelect}
-        onDelete={onDelete}
-        selectMode={state.selectMode}
-        selectedIds={state.selectedIds}
-        toggleId={state.toggleId}
-      />
+      <EmailListHeader />
+      {searching && <SearchBar />}
+      <EmailListBody />
       <ResizeHandle onMouseDown={onHandleMouseDown} />
+      <CollapseButton onClick={onCollapse} />
     </div>
   );
 }
 
+function ResizableEmailList(props: ResizableProps) {
+  const {
+    emails,
+    selectedId,
+    onSelect,
+    onDelete,
+    filter,
+    width,
+    onHandleMouseDown,
+    onCollapse,
+  } = props;
+  return (
+    <EmailListProvider
+      emails={emails}
+      selectedId={selectedId}
+      onSelect={onSelect}
+      onDelete={onDelete}
+      filter={filter}
+    >
+      <EmailListContent
+        width={width}
+        onHandleMouseDown={onHandleMouseDown}
+        onCollapse={onCollapse}
+      />
+    </EmailListProvider>
+  );
+}
+
 export default function EmailList(props: Props) {
-  const { width, onMouseDown, collapsed, expand } = useResizableWidth();
-  if (collapsed) return <CollapseButton onClick={expand} />;
-  return <EmailListContent {...props} width={width} onHandleMouseDown={onMouseDown} />;
+  const { width, onMouseDown, collapsed, expand, collapse } =
+    useResizableWidth();
+  if (collapsed) {
+    return <ExpansionButton onClick={expand} />;
+  }
+  return (
+    <ResizableEmailList
+      {...props}
+      width={width}
+      onHandleMouseDown={onMouseDown}
+      onCollapse={collapse}
+    />
+  );
 }

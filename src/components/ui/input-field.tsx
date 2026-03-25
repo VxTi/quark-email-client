@@ -1,8 +1,8 @@
-"use client";
-import { Field } from "@base-ui/react/field";
-import type { ComponentProps } from "react";
+'use client';
+import { Field } from '@base-ui/react/field';
+import type { ComponentProps } from 'react';
 
-interface Props extends Omit<ComponentProps<"input">, "onChange"> {
+interface Props extends Omit<ComponentProps<'input'>, 'onChange'> {
   label: string;
   type?: string;
   value: string;
@@ -12,7 +12,7 @@ interface Props extends Omit<ComponentProps<"input">, "onChange"> {
 
 export default function InputField({
   label,
-  type = "text",
+  type = 'text',
   value,
   onChange,
   error,
@@ -20,14 +20,25 @@ export default function InputField({
 }: Props) {
   return (
     <Field.Root invalid={!!error} className="flex flex-col gap-1.5">
-      <Field.Label className="text-sm font-medium text-foreground">{label}</Field.Label>
+      <Field.Label className="text-foreground text-sm font-medium">
+        {label}
+      </Field.Label>
       <Field.Control
         render={
-          <input type={type} value={value} onChange={(e) => onChange(e.target.value)} {...props} />
+          <input
+            type={type}
+            value={value}
+            onChange={e => {
+              onChange(e.target.value);
+            }}
+            {...props}
+          />
         }
-        className="px-3 py-2 border border-border rounded-xl bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring/30 transition-shadow w-full"
+        className="border-border bg-card text-foreground focus:ring-ring/30 w-full rounded-xl border px-3 py-2 text-sm transition-shadow focus:ring-2 focus:outline-none"
       />
-      {error && <Field.Error className="text-red-500 text-xs">{error}</Field.Error>}
+      {error && (
+        <Field.Error className="text-xs text-red-500">{error}</Field.Error>
+      )}
     </Field.Root>
   );
 }

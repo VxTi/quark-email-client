@@ -1,6 +1,6 @@
-import "server-only";
-import { ImapFlow } from "imapflow";
-import { decrypt } from "./encryption";
+import 'server-only';
+import { ImapFlow } from 'imapflow';
+import { decrypt } from './encryption';
 
 export interface ImapCredentials {
   imapHost: string | null;
@@ -12,17 +12,17 @@ export interface ImapCredentials {
 
 function buildImapClient(creds: ImapCredentials): ImapFlow {
   return new ImapFlow({
-    host: creds.imapHost ?? "",
+    host: creds.imapHost ?? '',
     port: creds.imapPort ?? 993,
     secure: creds.imapSecure ?? true,
-    auth: { user: creds.accountId, pass: decrypt(creds.password ?? "") },
+    auth: { user: creds.accountId, pass: decrypt(creds.password ?? '') },
     logger: false,
   });
 }
 
 export async function withImapClient<T>(
   creds: ImapCredentials,
-  fn: (client: ImapFlow) => Promise<T>,
+  fn: (client: ImapFlow) => Promise<T>
 ): Promise<T> {
   const client = buildImapClient(creds);
   await client.connect();

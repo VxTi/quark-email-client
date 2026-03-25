@@ -1,7 +1,7 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { type NextRequest, NextResponse } from "next/server";
-import { type z, type ZodObject, type ZodRawShape } from "zod/v4";
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
+import { type NextRequest, NextResponse } from 'next/server';
+import { type z, type ZodObject, type ZodRawShape } from 'zod/v4';
 
 type Optional = true | false;
 type UnwrapPromise<T> = T extends Promise<infer F> ? F : T;
@@ -23,7 +23,7 @@ type InferNullability<
 
 type BasicRequestHandler<RequestParameters> = (
   request: NextRequest,
-  { params }: { params: Promise<RequestParameters> },
+  { params }: { params: Promise<RequestParameters> }
 ) => Promise<NextResponse>;
 
 export type RequestHandler<
@@ -93,7 +93,7 @@ export interface RouteConfig<
      * Where to look for the request data.
      * Defaults to 'body'
      */
-    in?: "query" | "body";
+    in?: 'query' | 'body';
   };
 
   /**
@@ -114,16 +114,21 @@ export function createRoute<
     RequiresAuthentication,
     ZodRequestBodyValidator,
     ZodRequestParamsValidator
-  >,
+  >
 ): BasicRequestHandler<z.infer<ZodObject<ZodRequestParamsValidator>>> {
   return async function (
     request: NextRequest,
-    { params }: { params: Promise<z.infer<ZodObject<ZodRequestParamsValidator>>> },
+    {
+      params,
+    }: { params: Promise<z.infer<ZodObject<ZodRequestParamsValidator>>> }
   ): Promise<NextResponse> {
     try {
       let session: Session | null | undefined = undefined;
-      let body: z.infer<ZodObject<ZodRequestBodyValidator>> | undefined = undefined;
-      let processedParams: z.infer<ZodObject<ZodRequestParamsValidator>> | undefined = undefined;
+      let body: z.infer<ZodObject<ZodRequestBodyValidator>> | undefined =
+        undefined;
+      let processedParams:
+        | z.infer<ZodObject<ZodRequestParamsValidator>>
+        | undefined = undefined;
 
       if (config.requiresAuthentication) {
         session = await auth.api.getSession({
@@ -132,10 +137,10 @@ export function createRoute<
 
         if (!session) {
           if (config.verbose) {
-            console.debug("[401]: Unauthorized request");
+            console.debug('[401]: Unauthorized request');
           }
 
-          return NextResponse.json<ErrorResponse>({ error: "Unauthorized" }, { status: 401 });
+          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
       }
 
@@ -144,7 +149,9 @@ export function createRoute<
 
       if (config.requestValidator) {
         const validatorBody: unknown =
-          config.requestValidator.in === "query" ? searchParameters : await request.json();
+          config.requestValidator.in === 'query'
+            ? searchParameters
+            : await request.json();
 
         const validatorResult =
           await config.requestValidator.validator.safeParseAsync(validatorBody);
@@ -154,32 +161,35 @@ export function createRoute<
         if (!validatorResult.success && config.strict) {
           logVerbose(
             config.verbose,
-            "[400]: Request validation failed:",
-            validatorResult.error.message,
+            '[400]: Request validation failed:',
+            validatorResult.error.message
           );
-          return NextResponse.json<ErrorResponse>(
+          return NextResponse.json(
             { error: validatorResult.error.message },
-            { status: 400 },
+            { status: 400 }
           );
         }
       }
 
       if (config.paramsValidator) {
         const requestParameters = await params;
-        const validatedParams = await config.paramsValidator.safeParseAsync(requestParameters);
+        const validatedParams =
+          await config.paramsValidator.safeParseAsync(requestParameters);
 
-        processedParams = validatedParams.success ? validatedParams.data : undefined;
+        processedParams = validatedParams.success
+          ? validatedParams.data
+          : undefined;
 
         if (!validatedParams.success && config.strict) {
           logVerbose(
             config.verbose,
-            "[400]: Request validation failed:",
-            validatedParams.error.message,
+            '[400]: Request validation failed:',
+            validatedParams.error.message
           );
 
-          return NextResponse.json<ErrorResponse>(
-            { error: validatedParams.error.message ?? "Unknown error" },
-            { status: 400 },
+          return NextResponse.json(
+            { error: validatedParams.error.message ?? 'Unknown error' },
+            { status: 400 }
           );
         }
       }
@@ -198,21 +208,25 @@ export function createRoute<
         >,
       });
     } catch (error) {
-      logVerbose(config.verbose, "[500]: Error in API route handler:", error);
+      logVerbose(config.verbose, '[500]: Error in API route handler:', error);
 
-      return NextResponse.json<ErrorResponse>(
+      return NextResponse.json(
         {
           error:
-            "Internal server error. Please try again later. If the problem persists, please contact us at info@kaaspaleisdemare.nl",
+            'Internal server error. Please try again later. If the problem persists, please contact us at info@kaaspaleisdemare.nl',
         },
         {
           status: 500,
-        },
+        }
       );
     }
   };
 }
 
-function logVerbose(verbose: boolean | undefined, message: string, ...args: unknown[]): void {
+function logVerbose(
+  verbose: boolean | undefined,
+  message: string,
+  ...args: unknown[]
+): void {
   if (verbose) console.debug(message, ...args);
 }

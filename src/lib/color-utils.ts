@@ -1,4 +1,4 @@
-import { colord } from "colord";
+import { colord } from 'colord';
 
 export function hslToHex(h: number, s: number, l: number): string {
   return colord({ h, s, l }).toHex();

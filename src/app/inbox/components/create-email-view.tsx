@@ -1,15 +1,15 @@
-"use client";
-import "prosekit/basic/style.css";
-import { Field } from "@base-ui/react/field";
-import { XIcon } from "lucide-react";
-import { defineBasicExtension } from "prosekit/basic";
-import { createEditor } from "prosekit/core";
-import { ProseKit } from "prosekit/react";
-import type React from "react";
-import { useMemo, useRef, useState } from "react";
-import ResponseInputToolbar from "@/app/inbox/components/reply-composer/response-input-toolbar";
-import Button from "@/components/ui/button";
-import { sendEmail } from "@/lib/requests/mail";
+'use client';
+import 'prosekit/basic/style.css';
+import { Field } from '@base-ui/react/field';
+import { XIcon } from 'lucide-react';
+import { defineBasicExtension } from 'prosekit/basic';
+import { createEditor } from 'prosekit/core';
+import { ProseKit } from 'prosekit/react';
+import React, { useMemo, useRef, useState } from 'react';
+import EmailInputMessageToolbar from '@/app/inbox/components/reply-composer/email-input-message-toolbar';
+import Button from '@/components/ui/button';
+import { sendEmail } from '@/lib/requests/mail';
+import { toast } from 'sonner';
 
 export interface ComposeFormProps {
   to: string;
@@ -46,13 +46,20 @@ interface ComposeFooterProps {
 
 function ComposeFieldRow({ label, value, onChange }: FieldRowProps) {
   return (
-    <Field.Root className="flex items-center gap-3 px-4 py-2 border-b border-border">
-      <Field.Label className="text-xs font-medium text-muted-foreground w-12 shrink-0">
+    <Field.Root className="border-border flex items-center gap-3 border-b-2 px-4 py-2">
+      <Field.Label className="text-muted-foreground w-12 shrink-0 text-sm font-medium">
         {label}
       </Field.Label>
       <Field.Control
-        render={<input value={value} onChange={(e) => onChange(e.target.value)} />}
-        className="flex-1 bg-transparent text-sm text-foreground outline-none"
+        render={
+          <input
+            value={value}
+            onChange={e => {
+              onChange(e.target.value);
+            }}
+          />
+        }
+        className="text-foreground flex-1 bg-transparent text-sm outline-none"
       />
     </Field.Root>
   );
@@ -60,8 +67,8 @@ function ComposeFieldRow({ label, value, onChange }: FieldRowProps) {
 
 function ComposeViewHeader({ onClose }: { onClose: () => void }) {
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
-      <h2 className="text-sm font-semibold text-foreground">New Message</h2>
+    <div className="border-border flex h-14 shrink-0 items-center justify-between border-b-2 px-4 py-3">
+      <h2 className="text-foreground text-sm font-semibold">New Message</h2>
       <Button variant="ghost" size="icon" onClick={onClose}>
         <XIcon className="size-4" />
       </Button>
@@ -90,28 +97,39 @@ function ComposeFormFields({
 }
 
 function useComposeBody() {
-  const editor = useMemo(() => createEditor({ extension: defineBasicExtension() }), []);
+  const editor = useMemo(
+    () => createEditor({ extension: defineBasicExtension() }),
+    []
+  );
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
   const onAttach = () => fileRef.current?.click();
   const onFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
-    setAttachments((prev) => [...prev, ...files.map((f) => ({ name: f.name }))]);
-    e.target.value = "";
+    setAttachments(prev => [...prev, ...files.map(f => ({ name: f.name }))]);
+    e.target.value = '';
   };
-  const remove = (name: string) => setAttachments((prev) => prev.filter((a) => a.name !== name));
+  const remove = (name: string) => {
+    setAttachments(prev => prev.filter(a => a.name !== name));
+  };
   return { editor, attachments, fileRef, onAttach, onFiles, remove };
 }
 
-function ComposeAttachmentChip({ name, onRemove }: { name: string; onRemove: () => void }) {
+function ComposeAttachmentChip({
+  name,
+  onRemove,
+}: {
+  name: string;
+  onRemove: () => void;
+}) {
   return (
-    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-muted border border-border rounded-lg text-xs text-muted-foreground">
+    <div className="bg-muted border-border text-muted-foreground flex items-center gap-1.5 rounded-lg border-2 px-2.5 py-1 text-xs">
       <span>📎</span>
-      <span className="truncate max-w-30">{name}</span>
+      <span className="max-w-30 truncate">{name}</span>
       <button
         type="button"
         onClick={onRemove}
-        className="ml-0.5 leading-none hover:text-foreground cursor-pointer"
+        className="hover:text-foreground ml-0.5 cursor-pointer leading-none"
       >
         ×
       </button>
@@ -128,38 +146,60 @@ function ComposeAttachmentList({
 }) {
   if (!attachments.length) return null;
   return (
-    <div className="flex flex-wrap gap-2 px-4 py-2 border-t border-border shrink-0">
-      {attachments.map((a) => (
-        <ComposeAttachmentChip key={a.name} name={a.name} onRemove={() => onRemove(a.name)} />
+    <div className="border-border flex shrink-0 flex-wrap gap-2 border-t-2 px-4 py-2">
+      {attachments.map(a => (
+        <ComposeAttachmentChip
+          key={a.name}
+          name={a.name}
+          onRemove={() => {
+            onRemove(a.name);
+          }}
+        />
       ))}
     </div>
   );
 }
 
-function ComposeBodyFooter({ fileRef, onAttach, onFiles, onSend, sending }: ComposeFooterProps) {
+function ComposeBodyFooter({
+  fileRef,
+  onAttach,
+  onFiles,
+  onSend,
+  sending,
+}: ComposeFooterProps) {
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-t border-border shrink-0">
+    <div className="border-border flex shrink-0 items-center justify-between border-t-2 px-4 py-3">
       <div className="flex">
-        <input ref={fileRef} type="file" multiple className="hidden" onChange={onFiles} />
+        <input
+          ref={fileRef}
+          type="file"
+          multiple
+          className="hidden"
+          onChange={onFiles}
+        />
         <Button variant="ghost" onClick={onAttach}>
           📎
         </Button>
       </div>
       <Button onClick={onSend} disabled={sending}>
-        {sending ? "Sending..." : "Send"}
+        {sending ? 'Sending...' : 'Send'}
       </Button>
     </div>
   );
 }
 
-function ComposeBodyEditor({ editor }: { editor: ReturnType<typeof createEditor> }) {
+function ComposeBodyEditor({
+  editor,
+}: {
+  editor: ReturnType<typeof createEditor>;
+}) {
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
+    <div className="flex flex-1 flex-col overflow-hidden">
       <ProseKit editor={editor}>
-        <ResponseInputToolbar />
+        <EmailInputMessageToolbar />
         <div
           ref={editor.mount as React.Ref<HTMLDivElement>}
-          className="flex-1 px-4 py-3 overflow-y-auto text-sm text-foreground outline-none leading-relaxed"
+          className="text-foreground flex-1 overflow-y-auto px-4 py-3 text-sm leading-relaxed outline-none"
         />
       </ProseKit>
     </div>
@@ -179,7 +219,8 @@ function ComposeBody({
   subject: string;
   onClose: () => void;
 }) {
-  const { editor, attachments, fileRef, onAttach, onFiles, remove } = useComposeBody();
+  const { editor, attachments, fileRef, onAttach, onFiles, remove } =
+    useComposeBody();
   const [sending, setSending] = useState(false);
 
   const onSend = async () => {
@@ -195,16 +236,16 @@ function ComposeBody({
 
       onClose();
     } catch (error) {
-      console.error(error);
-      const message = error instanceof Error ? error.message : "Failed to send email";
-      alert(message);
+      const message =
+        error instanceof Error ? error.message : 'Failed to send email';
+      toast.error(message);
     } finally {
       setSending(false);
     }
   };
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
+    <div className="flex flex-1 flex-col overflow-hidden">
       <ComposeBodyEditor editor={editor} />
       <ComposeAttachmentList attachments={attachments} onRemove={remove} />
       <ComposeBodyFooter
@@ -218,9 +259,9 @@ function ComposeBody({
   );
 }
 
-export default function ComposeView({ onClose, ...form }: Props) {
+export default function CreateEmailView({ onClose, ...form }: Props) {
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden">
+    <div className="bg-card flex h-full flex-1 flex-col overflow-hidden">
       <ComposeViewHeader onClose={onClose} />
       <ComposeFormFields {...form} />
       <ComposeBody {...form} onClose={onClose} />

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
 export default function SidebarSectionTitle({ title }: { title: string }) {
   return (
-    <h2 className="text-xs mb-2 font-medium uppercase tracking-wide text-muted-foreground whitespace-nowrap overflow-hidden">
+    <h2 className="text-muted-foreground mb-2 overflow-hidden text-xs font-medium tracking-wide whitespace-nowrap uppercase">
       {title}
     </h2>
   );

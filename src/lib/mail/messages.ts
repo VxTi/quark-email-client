@@ -1,11 +1,11 @@
-import "server-only";
-import { simpleParser } from "mailparser";
-import { and, eq } from "drizzle-orm";
-import { db } from "@/db";
-import { email } from "@/db/schema";
-import { InternalTag } from "@/types/email";
-import { withImapClient, type ImapCredentials } from "./imap-client";
-import type { Email } from "@/db/schema";
+import 'server-only';
+import { simpleParser } from 'mailparser';
+import { and, eq } from 'drizzle-orm';
+import { db } from '@/db';
+import { email } from '@/db/schema';
+import { InternalTag } from '@/types/email';
+import { withImapClient, type ImapCredentials } from './imap-client';
+import type { Email } from '@/db/schema';
 
 interface AddressObject {
   address?: string;
@@ -28,11 +28,11 @@ interface FetchedMessage {
 function buildFromValues(msg: FetchedMessage) {
   const from = msg.envelope?.from?.[0];
   return {
-    fromAddress: from?.address ?? "",
-    fromName: from?.name ?? "",
-    to: msg.envelope?.to?.map((a) => a.address).join(", ") ?? "",
-    messageId: msg.envelope?.messageId ?? "",
-    subject: msg.envelope?.subject ?? "",
+    fromAddress: from?.address ?? '',
+    fromName: from?.name ?? '',
+    to: msg.envelope?.to?.map(a => a.address).join(', ') ?? '',
+    messageId: msg.envelope?.messageId ?? '',
+    subject: msg.envelope?.subject ?? '',
     date: msg.envelope?.date ?? null,
   };
 }
@@ -41,7 +41,7 @@ function buildEmailValues(
   userId: string,
   accountId: string,
   folderId: string,
-  msg: FetchedMessage,
+  msg: FetchedMessage
 ) {
   return {
     id: crypto.randomUUID(),
@@ -50,8 +50,8 @@ function buildEmailValues(
     folderId,
     uid: String(msg.uid),
     internalTag: InternalTag.Inbox,
-    read: msg.flags?.has("\\Seen") ?? false,
-    starred: msg.flags?.has("\\Flagged") ?? false,
+    read: msg.flags?.has('\\Seen') ?? false,
+    starred: msg.flags?.has('\\Flagged') ?? false,
     hasAttachments: (msg.bodyStructure?.childNodes?.length ?? 0) > 0,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -65,7 +65,11 @@ async function upsertMessage(values: ReturnType<typeof buildEmailValues>) {
     .values(values)
     .onConflictDoUpdate({
       target: [email.folderId, email.uid],
-      set: { read: values.read, starred: values.starred, updatedAt: new Date() },
+      set: {
+        read: values.read,
+        starred: values.starred,
+        updatedAt: new Date(),
+      },
     })
     .returning();
   return row;
@@ -76,10 +80,10 @@ export async function fetchEnvelopes(
   accountId: string,
   folderId: string,
   creds: ImapCredentials,
-  folderPath: string,
+  folderPath: string
 ) {
   const msgs: FetchedMessage[] = [];
-  await withImapClient(creds, async (client) => {
+  await withImapClient(creds, async client => {
     const status = await client.mailboxOpen(folderPath);
     const seq = `${Math.max(1, status.exists - 49)}:*`;
     for await (const msg of client.fetch(seq, {
@@ -92,7 +96,9 @@ export async function fetchEnvelopes(
     }
   });
   return Promise.all(
-    msgs.map((m) => upsertMessage(buildEmailValues(userId, accountId, folderId, m))),
+    msgs.map(m =>
+      upsertMessage(buildEmailValues(userId, accountId, folderId, m))
+    )
   );
 }
 
@@ -108,15 +114,19 @@ export async function getMessageById(id: string, userId: string) {
   return msg ?? null;
 }
 
-export async function fetchMessageBody(uid: string, creds: ImapCredentials, folderPath: string) {
-  let bodyHtml = "";
-  let bodyText = "";
-  await withImapClient(creds, async (client) => {
+export async function fetchMessageBody(
+  uid: string,
+  creds: ImapCredentials,
+  folderPath: string
+) {
+  let bodyHtml = '';
+  let bodyText = '';
+  await withImapClient(creds, async client => {
     await client.mailboxOpen(folderPath);
     const { content } = await client.download(uid, undefined, { uid: true });
     const parsed = await simpleParser(content);
-    bodyHtml = (typeof parsed.html === "string" ? parsed.html : "") || "";
-    bodyText = parsed.text ?? "";
+    bodyHtml = (typeof parsed.html === 'string' ? parsed.html : '') || '';
+    bodyText = parsed.text ?? '';
   });
   return { bodyHtml, bodyText };
 }
@@ -124,10 +134,14 @@ export async function fetchMessageBody(uid: string, creds: ImapCredentials, fold
 export async function ensureBodyLoaded(
   msg: Email,
   creds: ImapCredentials,
-  folderPath: string,
+  folderPath: string
 ): Promise<Email> {
   if (msg.bodyHtml || msg.bodyText || !msg.uid) return msg;
-  const { bodyHtml, bodyText } = await fetchMessageBody(msg.uid, creds, folderPath);
+  const { bodyHtml, bodyText } = await fetchMessageBody(
+    msg.uid,
+    creds,
+    folderPath
+  );
   const preview = bodyText.slice(0, 150);
   const [updated] = await db
     .update(email)
@@ -140,7 +154,7 @@ export async function ensureBodyLoaded(
 export async function updateMessageFlags(
   emailId: string,
   userId: string,
-  flags: { read?: boolean; starred?: boolean },
+  flags: { read?: boolean; starred?: boolean }
 ) {
   const [updated] = await db
     .update(email)

@@ -1,28 +1,39 @@
-"use client";
-import { useState } from "react";
-import ComposeView from "@/app/inbox/components/compose-view";
-import EmailList from "@/app/inbox/components/email-list";
-import EmailViewer from "@/app/inbox/components/email-viewer";
-import SaveEmailDialog from "@/app/inbox/components/save-email-dialog";
-import Sidebar from "@/app/inbox/components/sidebar";
-import { useEmails } from "@/lib/email-context";
-import { InternalTag, type ActiveFilter } from "@/types/email";
-import { saveEmail } from "@/lib/requests/emails";
-import type { Email } from "@/types/email";
+'use client';
+import { useState }    from 'react';
+import CreateEmailView from '@/app/inbox/components/create-email-view';
+import EmailList       from '@/app/inbox/components/email-list';
+import EmailViewer from '@/app/inbox/components/email-viewer';
+import SaveEmailDialog from '@/app/inbox/components/save-email-dialog';
+import Sidebar from '@/app/inbox/components/sidebar';
+import { useEmails } from '@/lib/email-context';
+import { InternalTag, type ActiveFilter } from '@/types/email';
+import { saveEmail } from '@/lib/requests/emails';
+import type { Email } from '@/types/email';
 
 function useComposeForm() {
-  const [to, setTo] = useState("");
-  const [cc, setCc] = useState("");
-  const [bcc, setBcc] = useState("");
-  const [subject, setSubject] = useState("");
+  const [to, setTo] = useState('');
+  const [cc, setCc] = useState('');
+  const [bcc, setBcc] = useState('');
+  const [subject, setSubject] = useState('');
   const isDirty = [to, cc, bcc, subject].some(Boolean);
   const reset = () => {
-    setTo("");
-    setCc("");
-    setBcc("");
-    setSubject("");
+    setTo('');
+    setCc('');
+    setBcc('');
+    setSubject('');
   };
-  return { to, setTo, cc, setCc, bcc, setBcc, subject, setSubject, isDirty, reset };
+  return {
+    to,
+    setTo,
+    cc,
+    setCc,
+    bcc,
+    setBcc,
+    subject,
+    setSubject,
+    isDirty,
+    reset,
+  };
 }
 
 function useComposing(form: { isDirty: boolean; reset: () => void }) {
@@ -51,7 +62,7 @@ function useFilter() {
 function useConfirmSave(
   form: ReturnType<typeof useComposeForm>,
   comp: ReturnType<typeof useComposing>,
-  setSelected: (e: Email | null) => void,
+  setSelected: (e: Email | null) => void
 ) {
   const { addEmail } = useEmails();
   return async (save: boolean) => {
@@ -88,8 +99,14 @@ export default function InboxPage() {
   const state = useInboxState(form);
   const { filter, setFilter } = useFilter();
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
-      <Sidebar onCompose={() => state.setComposing(true)} filter={filter} onFilter={setFilter} />
+    <div className="bg-background flex h-screen overflow-hidden">
+      <Sidebar
+        onCompose={() => {
+          state.setComposing(true);
+        }}
+        filter={filter}
+        onFilter={setFilter}
+      />
       <EmailList
         emails={state.emails}
         selectedId={state.selected?.id}
@@ -98,7 +115,7 @@ export default function InboxPage() {
         filter={filter}
       />
       {state.composing ? (
-        <ComposeView onClose={state.close} {...form} />
+        <CreateEmailView onClose={state.close} {...form} />
       ) : (
         <EmailViewer email={state.selected} />
       )}

@@ -1,8 +1,8 @@
-"use client";
-import { SquarePenIcon } from "lucide-react";
-import UserProfilePopover from "@/app/inbox/components/user-profile-popover";
-import Button from "@/components/ui/button";
-import UserAvatar from "./user-avatar";
+'use client';
+import { SquarePenIcon } from 'lucide-react';
+import UserProfilePopover from '@/app/inbox/components/user-profile-popover';
+import Button from '@/components/ui/button';
+import UserAvatar from './user-avatar';
 
 interface SidebarHeaderProps {
   user?: { image?: string | null; name: string; email?: string } | null;
@@ -11,9 +11,9 @@ interface SidebarHeaderProps {
 
 export default function SidebarHeader({ user, onCompose }: SidebarHeaderProps) {
   return (
-    <div className="flex items-center justify-between min-h-10">
+    <div className="flex min-h-10 items-center justify-between">
       <UserProfilePopover user={user}>
-        <button type="button" className="max-w-max outline-none cursor-pointer">
+        <button type="button" className="max-w-max cursor-pointer outline-none">
           <UserAvatar user={user} />
         </button>
       </UserProfilePopover>

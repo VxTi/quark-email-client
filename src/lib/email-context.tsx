@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import type { ApiEmail } from "@/models/email";
-import type { ReactNode } from "react";
-import { createContext, useContext, useEffect, useState } from "react";
-import { fetchEmails } from "@/lib/requests/emails";
-import type { Email, Tag } from "@/types/email";
+import type { ApiEmail } from '@/models/email';
+import type { ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { fetchEmails } from '@/lib/requests/emails';
+import type { Email, Tag } from '@/types/email';
 
 interface EmailContextType {
   emails: Email[];
@@ -17,7 +17,9 @@ interface EmailContextType {
 const EmailContext = createContext<EmailContextType | undefined>(undefined);
 
 function toUiEmailBase(api: ApiEmail) {
-  const from = api.fromName ? `${api.fromName} <${api.fromAddress}>` : api.fromAddress;
+  const from = api.fromName
+    ? `${api.fromName} <${api.fromAddress}>`
+    : api.fromAddress;
   return {
     id: api.id,
     from,
@@ -26,8 +28,8 @@ function toUiEmailBase(api: ApiEmail) {
     preview: api.preview || api.body.slice(0, 100),
     date: api.date ?? api.createdAt,
     read: api.read,
-    messages: [] as Email["messages"],
-    tags: [] as Email["tags"],
+    messages: [] as Email['messages'],
+    tags: [] as Email['tags'],
   };
 }
 
@@ -46,19 +48,27 @@ export function EmailProvider({ children }: { children: ReactNode }) {
   const [emails, setEmails] = useState<Email[]>([]);
 
   useEffect(() => {
-    void fetchEmails().then((apiEmails) => setEmails(apiEmails.map(toUiEmail)));
+    void fetchEmails().then(apiEmails => {
+      setEmails(apiEmails.map(toUiEmail));
+    });
   }, []);
 
-  const addEmail = (apiEmail: ApiEmail) => setEmails((prev) => [...prev, toUiEmail(apiEmail)]);
+  const addEmail = (apiEmail: ApiEmail) => {
+    setEmails(prev => [...prev, toUiEmail(apiEmail)]);
+  };
 
-  const updateEmailTags = (id: string, tags: Tag[]) =>
-    setEmails((prev) => prev.map((e) => (e.id === id ? { ...e, tags } : e)));
+  const updateEmailTags = (id: string, tags: Tag[]) => {
+    setEmails(prev => prev.map(e => (e.id === id ? { ...e, tags } : e)));
+  };
 
-  const deleteEmails = (ids: string[]) =>
-    setEmails((prev) => prev.filter((e) => !ids.includes(e.id)));
+  const deleteEmails = (ids: string[]) => {
+    setEmails(prev => prev.filter(e => !ids.includes(e.id)));
+  };
 
   return (
-    <EmailContext.Provider value={{ emails, setEmails, updateEmailTags, deleteEmails, addEmail }}>
+    <EmailContext.Provider
+      value={{ emails, setEmails, updateEmailTags, deleteEmails, addEmail }}
+    >
       {children}
     </EmailContext.Provider>
   );
@@ -67,7 +77,7 @@ export function EmailProvider({ children }: { children: ReactNode }) {
 export function useEmails() {
   const context = useContext(EmailContext);
   if (context === undefined) {
-    throw new Error("useEmails must be used within an EmailProvider");
+    throw new Error('useEmails must be used within an EmailProvider');
   }
   return context;
 }

@@ -1,20 +1,20 @@
-import { NextResponse } from "next/server";
-import { createRoute } from "@/lib/api-route";
-import { db } from "@/db";
-import { email } from "@/db/schema";
-import { InternalTag } from "@/types/email";
-import { DraftDataSchema, type DraftData } from "@/models";
+import { NextResponse } from 'next/server';
+import { createRoute } from '@/lib/api-route';
+import { db } from '@/db';
+import { email } from '@/db/schema';
+import { InternalTag } from '@/types/email';
+import { DraftDataSchema, type DraftData } from '@/models';
 
 function buildDraftValues(userId: string, data: DraftData) {
   return {
     id: crypto.randomUUID(),
     userId,
     internalTag: InternalTag.Draft,
-    to: data.to ?? "",
-    cc: data.cc ?? "",
-    bcc: data.bcc ?? "",
-    subject: data.subject ?? "",
-    body: data.body ?? "",
+    to: data.to ?? '',
+    cc: data.cc ?? '',
+    bcc: data.bcc ?? '',
+    subject: data.subject ?? '',
+    body: data.body ?? '',
     read: true as const,
     starred: false as const,
     createdAt: new Date(),

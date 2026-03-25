@@ -1,8 +1,15 @@
-"use client";
+'use client';
 
-import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from "react";
-import { createTagRequest, fetchTags } from "@/lib/requests/tags";
-import type { Tag } from "@/types/email";
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+import { createTagRequest, fetchTags } from '@/lib/requests/tags';
+import type { Tag } from '@/types/email';
 
 interface TagContextType {
   tags: Tag[];
@@ -38,7 +45,7 @@ export function TagProvider({ children }: { children: ReactNode }) {
         console.error(error);
       }
     },
-    [refreshTags],
+    [refreshTags]
   );
 
   useEffect(() => {
@@ -54,6 +61,6 @@ export function TagProvider({ children }: { children: ReactNode }) {
 
 export const useTags = () => {
   const context = useContext(TagContext);
-  if (!context) throw new Error("useTags must be used within TagProvider");
+  if (!context) throw new Error('useTags must be used within TagProvider');
   return context;
 };

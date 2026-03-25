@@ -1,10 +1,10 @@
-import { eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
-import { createRoute } from "@/lib/api-route";
-import { db } from "@/db";
-import { email } from "@/db/schema";
-import { InternalTag } from "@/types/email";
-import { EmailDataSchema, type EmailData } from "@/models";
+import { eq } from 'drizzle-orm';
+import { NextResponse } from 'next/server';
+import { createRoute } from '@/lib/api-route';
+import { db } from '@/db';
+import { email } from '@/db/schema';
+import { InternalTag } from '@/types/email';
+import { EmailDataSchema, type EmailData } from '@/models';
 
 async function insertEmail(userId: string, data: EmailData) {
   return db
@@ -14,11 +14,11 @@ async function insertEmail(userId: string, data: EmailData) {
       userId,
       tagId: data.tagId,
       internalTag: data.internalTag ?? InternalTag.Draft,
-      to: data.to ?? "",
-      cc: data.cc ?? "",
-      bcc: data.bcc ?? "",
-      subject: data.subject ?? "",
-      body: data.body ?? "",
+      to: data.to ?? '',
+      cc: data.cc ?? '',
+      bcc: data.bcc ?? '',
+      subject: data.subject ?? '',
+      body: data.body ?? '',
       createdAt: new Date(),
       updatedAt: new Date(),
     })
@@ -28,7 +28,10 @@ async function insertEmail(userId: string, data: EmailData) {
 export const GET = createRoute({
   requiresAuthentication: true,
   handler: async ({ session }) => {
-    const emails = await db.select().from(email).where(eq(email.userId, session.user.id));
+    const emails = await db
+      .select()
+      .from(email)
+      .where(eq(email.userId, session.user.id));
     return NextResponse.json(emails);
   },
 });

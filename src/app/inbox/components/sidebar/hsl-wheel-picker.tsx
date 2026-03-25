@@ -1,5 +1,5 @@
-"use client";
-import ColorWheel from "./color-wheel";
+'use client';
+import ColorWheel from './color-wheel';
 
 interface HSLWheelPickerProps {
   h: number;
@@ -10,7 +10,14 @@ interface HSLWheelPickerProps {
   setL: (v: number) => void;
 }
 
-export default function HSLWheelPicker({ h, s, l, setH, setS, setL }: HSLWheelPickerProps) {
+export default function HSLWheelPicker({
+  h,
+  s,
+  l,
+  setH,
+  setS,
+  setL,
+}: HSLWheelPickerProps) {
   const handleWheelChange = (hue: number, saturation: number) => {
     setH(hue);
     setS(saturation);

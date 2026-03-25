@@ -1,25 +1,25 @@
-"use client";
-import { useState } from "react";
-import Button from "@/components/ui/button";
-import InputField from "@/components/ui/input-field";
-import { authClient } from "@/lib/auth-client";
+'use client';
+import { useState } from 'react';
+import Button from '@/components/ui/button';
+import InputField from '@/components/ui/input-field';
+import { authClient } from '@/lib/auth-client';
 
 interface Props {
   onContinue: (email: string) => void;
 }
 
-function useEmailForm(onContinue: Props["onContinue"]) {
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
+function useEmailForm(onContinue: Props['onContinue']) {
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const { error: err } = await authClient.emailOtp.sendVerificationOtp({
       email,
-      type: "sign-in",
+      type: 'sign-in',
     });
     if (err) {
-      setError(err.message ?? "Failed to send code");
+      setError(err.message ?? 'Failed to send code');
       return;
     }
     onContinue(email);
@@ -39,7 +39,7 @@ export default function LoginForm({ onContinue }: Props) {
         onChange={setEmail}
         error={error}
       />
-      <Button type="submit" className="w-full mt-2">
+      <Button type="submit" className="mt-2 w-full">
         Continue
       </Button>
     </form>

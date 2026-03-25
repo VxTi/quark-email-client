@@ -1,6 +1,6 @@
-import "server-only";
-import nodemailer from "nodemailer";
-import { decrypt } from "./encryption";
+import 'server-only';
+import nodemailer from 'nodemailer';
+import { decrypt } from './encryption';
 
 export interface SmtpCredentials {
   smtpHost: string | null;
@@ -12,9 +12,9 @@ export interface SmtpCredentials {
 
 export function createSmtpTransport(creds: SmtpCredentials) {
   return nodemailer.createTransport({
-    host: creds.smtpHost ?? "",
+    host: creds.smtpHost ?? '',
     port: creds.smtpPort ?? 587,
     secure: creds.smtpSecure ?? false,
-    auth: { user: creds.accountId, pass: decrypt(creds.password ?? "") },
+    auth: { user: creds.accountId, pass: decrypt(creds.password ?? '') },
   });
 }

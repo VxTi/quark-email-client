@@ -1,8 +1,12 @@
-"use client";
-import { useState } from "react";
-import Button from "@/components/ui/button";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { authClient } from "@/lib/auth-client";
+'use client';
+import { useState } from 'react';
+import Button from '@/components/ui/button';
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from '@/components/ui/input-otp';
+import { authClient } from '@/lib/auth-client';
 
 interface Props {
   email: string;
@@ -10,13 +14,16 @@ interface Props {
 }
 
 function useOtpForm(email: string, onSuccess: () => void) {
-  const [code, setCode] = useState("");
-  const [error, setError] = useState("");
+  const [code, setCode] = useState('');
+  const [error, setError] = useState('');
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error: err } = await authClient.signIn.emailOtp({ email, otp: code });
+    const { error: err } = await authClient.signIn.emailOtp({
+      email,
+      otp: code,
+    });
     if (err) {
-      setError(err.message ?? "Invalid code");
+      setError(err.message ?? 'Invalid code');
       return;
     }
     onSuccess();
@@ -28,15 +35,17 @@ export default function OtpVerificationForm({ email, onSuccess }: Props) {
   const { setCode, submit, code, error } = useOtpForm(email, onSuccess);
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
-      <p className="text-muted-foreground text-sm text-center">
+      <p className="text-muted-foreground text-center text-sm">
         We sent a code to <strong className="text-foreground">{email}</strong>.
       </p>
       <div className="flex flex-col items-center">
         <InputOTP
           maxLength={6}
           value={code}
-          onChange={(value) => setCode(value)}
-          className={error ? "border-destructive" : ""}
+          onChange={value => {
+            setCode(value);
+          }}
+          className={error ? 'border-destructive' : ''}
         >
           <InputOTPGroup className="w-full">
             <InputOTPSlot index={0} />
@@ -47,9 +56,9 @@ export default function OtpVerificationForm({ email, onSuccess }: Props) {
             <InputOTPSlot index={5} />
           </InputOTPGroup>
         </InputOTP>
-        {error && <p className="text-destructive text-sm mt-2">{error}</p>}
+        {error && <p className="text-destructive mt-2 text-sm">{error}</p>}
       </div>
-      <Button type="submit" className="w-full mt-2">
+      <Button type="submit" className="mt-2 w-full">
         Verify
       </Button>
     </form>

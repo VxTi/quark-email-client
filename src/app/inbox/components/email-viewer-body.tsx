@@ -1,9 +1,9 @@
-"use client";
-import { motion } from "framer-motion";
-import Markdown from "react-markdown";
-import { twMerge } from "tailwind-merge";
-import type { Email, EmailMessage } from "@/types/email";
-import ResponseInputField from "./reply-composer/response-input-field";
+'use client';
+import { motion } from 'framer-motion';
+import Markdown from 'react-markdown';
+import { twMerge } from 'tailwind-merge';
+import type { Email, EmailMessage } from '@/types/email';
+import ResponseInputField from './reply-composer/response-input-field';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -52,7 +52,7 @@ function Attachment({ name }: { name: string }) {
   return (
     <motion.div
       variants={attachmentVariants}
-      className="flex items-center gap-2 px-3 py-2 bg-card border border-border rounded-lg text-xs text-muted-foreground"
+      className="bg-card border-border text-muted-foreground flex items-center gap-2 rounded-lg border px-3 py-2 text-xs"
     >
       <span>📎</span>
       <span className="truncate">{name}</span>
@@ -63,8 +63,11 @@ function Attachment({ name }: { name: string }) {
 function AttachmentList({ attachments }: { attachments?: string[] }) {
   if (!attachments?.length) return null;
   return (
-    <motion.div variants={attachmentContainerVariants} className="flex flex-wrap gap-2 mt-1">
-      {attachments.map((a) => (
+    <motion.div
+      variants={attachmentContainerVariants}
+      className="mt-1 flex flex-wrap gap-2"
+    >
+      {attachments.map(a => (
         <Attachment key={a} name={a} />
       ))}
     </motion.div>
@@ -75,10 +78,10 @@ function BubbleContent({ message }: { message: EmailMessage }) {
   return (
     <div
       className={twMerge(
-        "px-4 py-3 rounded-2xl text-sm leading-relaxed",
+        'rounded-2xl px-4 py-3 text-sm leading-relaxed',
         message.isFromMe
-          ? "bg-primary text-primary-foreground rounded-tr-sm"
-          : "bg-muted text-foreground rounded-tl-sm",
+          ? 'bg-primary text-primary-foreground rounded-tr-sm'
+          : 'bg-muted text-foreground rounded-tl-sm'
       )}
     >
       <Markdown>{message.body}</Markdown>
@@ -91,11 +94,11 @@ function EmailBubble({ message }: { message: EmailMessage }) {
     <motion.div
       variants={itemVariants}
       className={twMerge(
-        `flex flex-col gap-1 max-w-[75%]`,
-        message.isFromMe ? "self-end items-end" : "self-start items-start",
+        `flex max-w-[75%] flex-col gap-1`,
+        message.isFromMe ? 'items-end self-end' : 'items-start self-start'
       )}
     >
-      <span className="text-xs text-muted-foreground px-1">
+      <span className="text-muted-foreground px-1 text-xs">
         {message.from} · {message.date}
       </span>
       <BubbleContent message={message} />
@@ -106,15 +109,15 @@ function EmailBubble({ message }: { message: EmailMessage }) {
 
 export default function EmailViewerBody({ email }: { email: Email }) {
   return (
-    <div className="flex flex-col flex-1 overflow-hidden max-w-5xl mx-auto w-full">
+    <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col overflow-hidden">
       <motion.div
         key={email.id}
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-4"
+        className="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-4"
       >
-        {email.messages.map((m) => (
+        {email.messages.map(m => (
           <EmailBubble key={m.id} message={m} />
         ))}
       </motion.div>

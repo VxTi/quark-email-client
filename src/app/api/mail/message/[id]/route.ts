@@ -1,10 +1,14 @@
-import { NextResponse } from "next/server";
-import { createRoute } from "@/lib/api-route";
-import { getMailAccountById } from "@/lib/mail/account";
-import { getFolderById } from "@/lib/mail/folders";
-import { ensureBodyLoaded, getMessageById, updateMessageFlags } from "@/lib/mail/messages";
-import { z } from "zod/v4";
-import { MessageFlagsSchema } from "@/models";
+import { NextResponse } from 'next/server';
+import { createRoute } from '@/lib/api-route';
+import { getMailAccountById } from '@/lib/mail/account';
+import { getFolderById } from '@/lib/mail/folders';
+import {
+  ensureBodyLoaded,
+  getMessageById,
+  updateMessageFlags,
+} from '@/lib/mail/messages';
+import { z } from 'zod/v4';
+import { MessageFlagsSchema } from '@/models';
 
 async function loadMessage(id: string, userId: string) {
   const msg = await getMessageById(id, userId);
@@ -27,7 +31,7 @@ export const GET = createRoute({
   paramsValidator,
   handler: async ({ session, params }) => {
     const msg = await loadMessage(params.id, session.user.id);
-    if (!msg) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (!msg) return NextResponse.json({ error: 'Not found' }, { status: 404 });
     return NextResponse.json(msg);
   },
 });
@@ -41,7 +45,8 @@ export const PATCH = createRoute({
   },
   handler: async ({ session, data, params }) => {
     const updated = await updateMessageFlags(params.id, session.user.id, data);
-    if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (!updated)
+      return NextResponse.json({ error: 'Not found' }, { status: 404 });
     return NextResponse.json(updated);
   },
 });

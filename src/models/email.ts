@@ -1,5 +1,5 @@
-import { z } from "zod/v4";
-import { InternalTag } from "@/types/email";
+import { z } from 'zod/v4';
+import { InternalTag } from '@/types/email';
 
 export const InternalTagSchema = z.enum(InternalTag);
 
