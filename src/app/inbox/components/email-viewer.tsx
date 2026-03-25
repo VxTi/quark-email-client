@@ -8,7 +8,7 @@ interface Props {
 
 function EmptyState() {
   return (
-    <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
+    <div className="flex-1 flex items-center justify-center bg-card text-muted-foreground text-md">
       Select an email to read
     </div>
   );
@@ -17,7 +17,7 @@ function EmptyState() {
 export default function EmailViewer({ email }: Props) {
   if (!email) return <EmptyState />;
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden">
+    <div className="flex-1 flex flex-col h-full overflow-hidden bg-card">
       <EmailViewerHeader email={email} />
       <EmailViewerBody email={email} />
     </div>

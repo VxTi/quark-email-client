@@ -3,9 +3,9 @@
 @import "shadcn/tailwind.css";
 
 :root {
-  --background: #1e1e1e;
+  --background: #262626;
   --foreground: #dadada;
-  --card: #262626;
+  --card: #1E1E1E;
   --card-foreground: #dadada;
   --popover: #262626;
   --popover-foreground: #dadada;

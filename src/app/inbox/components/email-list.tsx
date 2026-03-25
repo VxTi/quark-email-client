@@ -139,7 +139,6 @@ function useResizableWidth() {
 
 function ResizeHandle({ onMouseDown }: { onMouseDown: (e: React.MouseEvent) => void }) {
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: it's fine
     <div
       onMouseDown={onMouseDown}
       className="absolute right-0 top-0 h-full w-1 cursor-col-resize hover:bg-border transition-colors z-10"
@@ -249,7 +248,7 @@ function TooltipButton({
 
 function SearchBar({ query, onChange, onClose }: SearchBarProps) {
   return (
-    <div className="px-3 py-2 border-b border-border flex items-center gap-2 shrink-0">
+    <div className="px-3 py-2 border-b-2 border-border flex items-center gap-2 shrink-0">
       <Search className="size-4 text-muted-foreground shrink-0" />
       <Field.Root className="flex-1">
         <Field.Control
@@ -300,8 +299,10 @@ function HeaderActions({
 
 function EmailListHeader({ title, ...actions }: HeaderProps) {
   return (
-    <div className="px-4 py-2.5 border-b border-border shrink-0 flex items-center justify-between">
-      <h2 className="font-semibold text-foreground text-sm">{title}</h2>
+    <div className="px-4 py-2.5 border-b-2 border-border shrink-0 flex items-center justify-between">
+      <div className="flex-1 min-w-0">
+        <h2 className="font-semibold text-foreground text-sm truncate">{title}</h2>
+      </div>
       <HeaderActions {...actions} />
     </div>
   );
@@ -373,6 +374,11 @@ function EmailListBody({
           />
         </EmailItemMenu>
       ))}
+      {emails.length === 0 && (
+        <div className="flex items-center justify-center pt-6 text-sm text-muted-foreground max-w-3/4 mx-auto">
+          It seems there are no emails to be found here.
+        </div>
+      )}
     </div>
   );
 }
@@ -396,7 +402,7 @@ function EmailListContent({
   };
   return (
     <div
-      className="relative h-full flex flex-col border-r border-border shrink-0"
+      className="relative h-full flex flex-col border-r-2 border-border shrink-0"
       style={{ width }}
     >
       <EmailListHeader {...headerProps} />

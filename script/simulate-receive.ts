@@ -1,6 +1,5 @@
 import { config } from "dotenv";
 import path from "path";
-import { eq } from "drizzle-orm";
 
 config({ path: path.resolve(process.cwd(), ".env.local") });
 
@@ -9,11 +8,7 @@ import { email, account } from "@/db/schema";
 import { InternalTag } from "@/types/email";
 
 async function simulateReceive() {
-  const [acc] = await db
-    .select()
-    .from(account)
-    .where(eq(account.providerId, "email"))
-    .limit(1);
+  const [acc] = await db.select().from(account).limit(1);
   if (!acc) {
     console.error("No mail account found to simulate receiving email.");
     process.exit(1);
