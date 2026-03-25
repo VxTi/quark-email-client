@@ -9,7 +9,13 @@ async function getSession() {
   return auth.api.getSession({ headers: await headers() });
 }
 
-type DraftData = { to?: string; cc?: string; bcc?: string; subject?: string; body?: string };
+interface DraftData {
+  to?: string;
+  cc?: string;
+  bcc?: string;
+  subject?: string;
+  body?: string;
+}
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();

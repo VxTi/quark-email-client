@@ -14,7 +14,7 @@ export async function getMailAccountById(id: string) {
   return acc ?? null;
 }
 
-type CreateMailAccountData = {
+interface CreateMailAccountData {
   displayName: string;
   email: string;
   password: string;
@@ -24,7 +24,7 @@ type CreateMailAccountData = {
   smtpHost: string;
   smtpPort: number;
   smtpSecure: boolean;
-};
+}
 
 function buildAccountValues(userId: string, data: CreateMailAccountData) {
   return {

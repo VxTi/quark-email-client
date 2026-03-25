@@ -19,15 +19,15 @@ written justification in a comment above the function.
 
 ```tsx
 // 22 lines — REJECTED
-export default function LoginForm({onTwoFactor}: Props) {
-  const [ email, setEmail ]       = useState("");
-  const [ password, setPassword ] = useState("");
-  const [ error, setError ]       = useState("");
-  const router                    = useRouter();
+export default function LoginForm({ onTwoFactor }: Props) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const router = useRouter();
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const {data, error: err} = await authClient.signIn.email({email, password});
+    const { data, error: err } = await authClient.signIn.email({ email, password });
     if (err) {
       setError(err.message ?? "Login failed");
       return;
@@ -38,7 +38,13 @@ export default function LoginForm({onTwoFactor}: Props) {
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
       <InputField label="Email" type="email" value={email} onChange={setEmail} />
-      <InputField label="Password" type="password" value={password} onChange={setPassword} error={error} />
+      <InputField
+        label="Password"
+        type="password"
+        value={password}
+        onChange={setPassword}
+        error={error}
+      />
       <Button type="submit">Sign In</Button>
     </form>
   );
@@ -50,14 +56,14 @@ export default function LoginForm({onTwoFactor}: Props) {
 ```tsx
 // Hook: 15 lines
 function useLoginForm(onTwoFactor: () => void) {
-  const [ email, setEmail ]       = useState("");
-  const [ password, setPassword ] = useState("");
-  const [ error, setError ]       = useState("");
-  const router                    = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const router = useRouter();
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const {data, error: err} = await authClient.signIn.email({email, password});
+    const { data, error: err } = await authClient.signIn.email({ email, password });
     if (err) {
       setError(err.message ?? "Login failed");
       return;
@@ -65,16 +71,22 @@ function useLoginForm(onTwoFactor: () => void) {
     data?.twoFactorRedirect ? onTwoFactor() : router.push("/inbox");
   };
 
-  return {email, setEmail, password, setPassword, error, submit};
+  return { email, setEmail, password, setPassword, error, submit };
 }
 
 // Component: 9 lines ✓
-export default function LoginForm({onTwoFactor}: Props) {
-  const {email, setEmail, password, setPassword, error, submit} = useLoginForm(onTwoFactor);
+export default function LoginForm({ onTwoFactor }: Props) {
+  const { email, setEmail, password, setPassword, error, submit } = useLoginForm(onTwoFactor);
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
       <InputField label="Email" type="email" value={email} onChange={setEmail} />
-      <InputField label="Password" type="password" value={password} onChange={setPassword} error={error} />
+      <InputField
+        label="Password"
+        type="password"
+        value={password}
+        onChange={setPassword}
+        error={error}
+      />
       <Button type="submit">Sign In</Button>
     </form>
   );
@@ -112,7 +124,7 @@ exclusively with **Tailwind utility classes**.
 Defined in `globals.css` via Tailwind's `@theme`. **Always use these — never hardcode values.**
 
 | CSS Variable           | Class                         | Purpose                            |
-|------------------------|-------------------------------|------------------------------------|
+| ---------------------- | ----------------------------- | ---------------------------------- |
 | `--background`         | `bg-background`               | Page background (warm off-white)   |
 | `--foreground`         | `text-foreground`             | Primary text                       |
 | `--card`               | `bg-card`                     | Card / panel background            |

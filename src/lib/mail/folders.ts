@@ -5,7 +5,11 @@ import { folder } from "@/db/schema";
 import { FolderType } from "@/types/email";
 import { withImapClient, type ImapCredentials } from "./imap-client";
 
-type MailboxInfo = { path: string; name: string; specialUse?: string };
+interface MailboxInfo {
+  path: string;
+  name: string;
+  specialUse?: string;
+}
 
 function classifyFolder(mb: MailboxInfo): FolderType {
   if (mb.specialUse === "\\Sent") return FolderType.Sent;

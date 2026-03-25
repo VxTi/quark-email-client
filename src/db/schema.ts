@@ -76,13 +76,13 @@ export const passkey = pgTable("passkey", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  credentialId: text("credential_id").notNull().unique(),
-  counter: integer("counter").notNull().default(0),
+  credentialID: text("credential_id").notNull(),
+  counter: integer("counter").notNull(),
   deviceType: text("device_type").notNull(),
   backedUp: boolean("backed_up").notNull(),
   transports: text("transports"),
+  createdAt: timestamp("created_at", { precision: 6, withTimezone: true }),
   aaguid: text("aaguid"),
-  createdAt: timestamp("created_at"),
 });
 
 export const tag = pgTable("tag", {

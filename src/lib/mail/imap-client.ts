@@ -2,13 +2,13 @@ import "server-only";
 import { ImapFlow } from "imapflow";
 import { decrypt } from "./encryption";
 
-export type ImapCredentials = {
+export interface ImapCredentials {
   imapHost: string;
   imapPort: number;
   imapSecure: boolean;
   email: string;
   encryptedPassword: string | null;
-};
+}
 
 function buildImapClient(creds: ImapCredentials): ImapFlow {
   return new ImapFlow({

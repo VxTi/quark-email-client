@@ -12,7 +12,13 @@ async function getSession() {
   return auth.api.getSession({ headers: await headers() });
 }
 
-type SendData = { to: string; cc?: string; bcc?: string; subject?: string; body?: string };
+interface SendData {
+  to: string;
+  cc?: string;
+  bcc?: string;
+  subject?: string;
+  body?: string;
+}
 
 async function dispatchEmail(account: MailAccount, data: SendData) {
   const transport = createSmtpTransport(account);

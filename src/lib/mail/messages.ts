@@ -7,20 +7,23 @@ import { InternalTag } from "@/types/email";
 import { withImapClient, type ImapCredentials } from "./imap-client";
 import type { Email } from "@/db/schema";
 
-type AddressObject = { address?: string; name?: string };
-type MessageEnvelope = {
+interface AddressObject {
+  address?: string;
+  name?: string;
+}
+interface MessageEnvelope {
   messageId?: string;
   date?: Date;
   subject?: string;
   from?: AddressObject[];
   to?: AddressObject[];
-};
-type FetchedMessage = {
+}
+interface FetchedMessage {
   uid: number;
   envelope?: MessageEnvelope;
   flags?: Set<string>;
   bodyStructure?: { childNodes?: unknown[] };
-};
+}
 
 function buildFromValues(msg: FetchedMessage) {
   const from = msg.envelope?.from?.[0];

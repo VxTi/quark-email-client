@@ -1,8 +1,10 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import type { ApiEmail } from "@/models/email";
+import type { ReactNode } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { fetchEmails } from "@/lib/requests/emails";
 import type { Email, Tag } from "@/types/email";
-import { fetchEmails, type ApiEmail } from "@/lib/requests/emails";
 
 interface EmailContextType {
   emails: Email[];
@@ -42,14 +44,19 @@ function toUiEmail(api: ApiEmail): Email {
 
 export function EmailProvider({ children }: { children: ReactNode }) {
   const [emails, setEmails] = useState<Email[]>([]);
+
   useEffect(() => {
-    fetchEmails().then((apiEmails) => setEmails(apiEmails.map(toUiEmail)));
+    void fetchEmails().then((apiEmails) => setEmails(apiEmails.map(toUiEmail)));
   }, []);
+
   const addEmail = (apiEmail: ApiEmail) => setEmails((prev) => [...prev, toUiEmail(apiEmail)]);
+
   const updateEmailTags = (id: string, tags: Tag[]) =>
     setEmails((prev) => prev.map((e) => (e.id === id ? { ...e, tags } : e)));
+
   const deleteEmails = (ids: string[]) =>
     setEmails((prev) => prev.filter((e) => !ids.includes(e.id)));
+
   return (
     <EmailContext.Provider value={{ emails, setEmails, updateEmailTags, deleteEmails, addEmail }}>
       {children}

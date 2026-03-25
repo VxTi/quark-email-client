@@ -42,7 +42,7 @@ export function TagProvider({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
-    refreshTags();
+    void refreshTags();
   }, [refreshTags]);
 
   return (

@@ -2,13 +2,13 @@ import "server-only";
 import nodemailer from "nodemailer";
 import { decrypt } from "./encryption";
 
-export type SmtpCredentials = {
+export interface SmtpCredentials {
   smtpHost: string;
   smtpPort: number;
   smtpSecure: boolean;
   email: string;
   encryptedPassword: string | null;
-};
+}
 
 export function createSmtpTransport(creds: SmtpCredentials) {
   return nodemailer.createTransport({

@@ -10,11 +10,11 @@ import { type ActiveFilter, InternalTag } from "@/types/email";
 import SidebarItem from "./sidebar-item";
 import SidebarSectionTitle from "./sidebar-section-title";
 
-type MailboxAction = {
+interface MailboxAction {
   icon: LucideIcon;
   text: string;
   value: InternalTag;
-};
+}
 
 const MAILBOX_ACTIONS: MailboxAction[] = [
   { icon: MessageCircleIcon, text: "Inbox", value: InternalTag.Inbox },
