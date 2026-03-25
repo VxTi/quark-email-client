@@ -19,3 +19,12 @@ export async function saveDraft(data: DraftData): Promise<ApiEmail> {
     decoder: ApiEmailSchema,
   });
 }
+
+export async function updateDraft(id: string, data: DraftData): Promise<ApiEmail> {
+  return request(`/api/mail/drafts/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+    headers: { 'Content-Type': 'application/json' },
+    decoder: ApiEmailSchema,
+  });
+}

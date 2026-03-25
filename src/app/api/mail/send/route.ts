@@ -1,4 +1,5 @@
 import { createRoute } from '@/lib/api-route';
+import { and, eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { email, type Account } from '@/db/schema';
 import { getAccountByUserId } from '@/lib/mail/account';
@@ -90,6 +91,14 @@ export const POST = createRoute({
 
     await dispatchEmail(account, data);
     await recordSentEmail(session.user.id, account.id, account.accountId, data);
+
+    if (data.draftId) {
+      await db
+        .delete(email)
+        .where(
+          and(eq(email.id, data.draftId), eq(email.userId, session.user.id))
+        );
+    }
 
     return NextResponse.json({ status: 'Success' }, { status: 204 });
   },

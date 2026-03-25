@@ -55,6 +55,7 @@ export const SendEmailSchema = z.object({
   bcc: z.string().optional(),
   subject: z.string().optional(),
   bodyHtml: z.string().optional(),
+  draftId: z.string().optional(),
   simulateReceive: z.boolean().optional(),
 });
 
