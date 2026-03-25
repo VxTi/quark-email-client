@@ -59,7 +59,7 @@ function applyFilters(
   }
   if (query) {
     result = result.filter(e =>
-      `${e.from} ${e.subject} ${e.preview}`
+      `${e.from} ${e.subject} ${e.bodyText ?? ''}`
         .toLowerCase()
         .includes(query.toLowerCase())
     );

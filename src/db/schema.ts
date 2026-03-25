@@ -157,8 +157,6 @@ export const email = pgTable(
     cc: text('cc').notNull().default(''),
     bcc: text('bcc').notNull().default(''),
     subject: text('subject').notNull().default(''),
-    preview: text('preview').notNull().default(''),
-    body: text('body').notNull().default(''),
     bodyHtml: text('body_html'),
     bodyText: text('body_text'),
     read: boolean('read').notNull().default(false),

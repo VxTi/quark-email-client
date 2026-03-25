@@ -18,7 +18,7 @@ async function insertEmail(userId: string, data: EmailData) {
       cc: data.cc ?? '',
       bcc: data.bcc ?? '',
       subject: data.subject ?? '',
-      body: data.body ?? '',
+      bodyHtml: data.bodyHtml ?? '',
       createdAt: new Date(),
       updatedAt: new Date(),
     })

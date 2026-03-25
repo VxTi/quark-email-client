@@ -117,7 +117,7 @@ function useReplySend(email: Email) {
         await sendEmail({
           to: email.from,
           subject: `Re: ${email.subject}`,
-          body,
+          bodyHtml: body,
         });
         toast.success('Reply sent');
       } catch (error) {
@@ -133,6 +133,9 @@ function useReplySend(email: Email) {
 
 export default function EmailViewerBody({ email }: { email: Email }) {
   const onSend = useReplySend(email);
+
+  console.log(email)
+
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col overflow-hidden">
       <motion.div

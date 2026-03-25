@@ -75,7 +75,7 @@ function useConfirmSave(
     if (save) {
       const data: DraftData = {
         to: form.to, cc: form.cc, bcc: form.bcc,
-        subject: form.subject, body: getBody.current(),
+        subject: form.subject, bodyHtml: getBody.current(),
       };
       addEmail(await saveDraft(data));
     }

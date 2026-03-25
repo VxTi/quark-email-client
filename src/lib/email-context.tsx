@@ -26,7 +26,6 @@ function toUiEmailBase(api: ApiEmail) {
     from,
     to: api.to,
     subject: api.subject,
-    preview: api.preview || api.body.slice(0, 100),
     date: api.date ?? api.createdAt,
     read: api.read,
     messages: [] as Email['messages'],
@@ -39,7 +38,8 @@ function toUiEmail(api: ApiEmail): Email {
     ...toUiEmailBase(api),
     cc: api.cc || undefined,
     bcc: api.bcc || undefined,
-    body: api.body || undefined,
+    bodyHtml: api.bodyHtml ?? undefined,
+    bodyText: api.bodyText ?? undefined,
     tagId: api.tagId ?? undefined,
     internalTag: api.internalTag,
   };

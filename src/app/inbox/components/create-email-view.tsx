@@ -114,7 +114,7 @@ function gatherDraftData(
 ): DraftData {
   return {
     to: form.to, cc: form.cc, bcc: form.bcc,
-    subject: form.subject, body: editor.getDocHTML(),
+    subject: form.subject, bodyHtml: editor.getDocHTML(),
   };
 }
 
@@ -268,7 +268,7 @@ function ComposeBody({
         cc,
         bcc,
         subject,
-        body: editor.getDocHTML(),
+        bodyHtml: editor.getDocHTML(),
       });
 
       onClose();

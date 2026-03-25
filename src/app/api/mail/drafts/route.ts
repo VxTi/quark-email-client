@@ -14,7 +14,7 @@ function buildDraftValues(userId: string, data: DraftData) {
     cc: data.cc ?? '',
     bcc: data.bcc ?? '',
     subject: data.subject ?? '',
-    body: data.body ?? '',
+    bodyHtml: data.bodyHtml ?? '',
     read: true as const,
     starred: false as const,
     createdAt: new Date(),

@@ -41,8 +41,8 @@ export interface Email {
   cc?: string;
   bcc?: string;
   subject: string;
-  preview: string;
-  body?: string;
+  bodyHtml?: string;
+  bodyText?: string;
   date: string;
   read: boolean;
   messages: EmailMessage[];

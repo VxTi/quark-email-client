@@ -8,14 +8,14 @@ import { NextResponse } from 'next/server';
 import { SendEmailSchema, type SendEmailData } from '@/models';
 
 async function dispatchEmail(account: Account, data: SendEmailData) {
-  const transport = createSmtpTransport(account);
+  const transport = await createSmtpTransport(account);
   return transport.sendMail({
     from: account.accountId, // Using accountId as it contains the email address
     to: data.to,
     cc: data.cc,
     bcc: data.bcc,
     subject: data.subject ?? '',
-    html: data.body ?? '',
+    html: data.bodyHtml ?? '',
   });
 }
 
@@ -35,7 +35,7 @@ function buildSentValues(
     cc: data.cc ?? '',
     bcc: data.bcc ?? '',
     subject: data.subject ?? '',
-    body: data.body ?? '',
+    bodyHtml: data.bodyHtml ?? '',
     read: true as const,
     starred: false as const,
     createdAt: new Date(),

@@ -6,7 +6,7 @@ export const mockEmails: Email[] = [
     from: 'alice@example.com',
     to: 'me@example.com',
     subject: 'Q1 Project Update',
-    preview: 'Sounds great, will do!',
+    bodyText: 'Sounds great, will do!',
     date: 'Mar 21',
     read: false,
     messages: [
@@ -43,7 +43,7 @@ export const mockEmails: Email[] = [
     from: 'bob@example.com',
     to: 'me@example.com',
     subject: 'Lunch tomorrow?',
-    preview: 'Are you free for lunch tomorrow around noon?',
+    bodyText: 'Are you free for lunch tomorrow around noon?',
     date: 'Mar 20',
     read: true,
     messages: [
@@ -62,7 +62,7 @@ export const mockEmails: Email[] = [
     from: 'noreply@github.com',
     to: 'me@example.com',
     subject: '[GitHub] Security alert',
-    preview: 'A new login was detected for your account.',
+    bodyText: 'A new login was detected for your account.',
     date: 'Mar 19',
     read: true,
     messages: [

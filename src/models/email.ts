@@ -16,8 +16,8 @@ export const ApiEmailSchema = z.object({
   cc: z.string(),
   bcc: z.string(),
   subject: z.string(),
-  preview: z.string(),
-  body: z.string(),
+  bodyHtml: z.string().nullable(),
+  bodyText: z.string().nullable(),
   read: z.boolean(),
   starred: z.boolean(),
   date: z.string().nullable(),
@@ -34,7 +34,7 @@ export const EmailDataSchema = z.object({
   cc: z.string().optional(),
   bcc: z.string().optional(),
   subject: z.string().optional(),
-  body: z.string().optional(),
+  bodyHtml: z.string().optional(),
 });
 
 export type EmailData = z.infer<typeof EmailDataSchema>;
@@ -44,7 +44,7 @@ export const DraftDataSchema = z.object({
   cc: z.string().optional(),
   bcc: z.string().optional(),
   subject: z.string().optional(),
-  body: z.string().optional(),
+  bodyHtml: z.string().optional(),
 });
 
 export type DraftData = z.infer<typeof DraftDataSchema>;
@@ -54,7 +54,7 @@ export const SendEmailSchema = z.object({
   cc: z.string().optional(),
   bcc: z.string().optional(),
   subject: z.string().optional(),
-  body: z.string().optional(),
+  bodyHtml: z.string().optional(),
   simulateReceive: z.boolean().optional(),
 });
 

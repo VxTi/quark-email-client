@@ -23,7 +23,7 @@ export const PUT = createRoute({
         cc: data.cc ?? '',
         bcc: data.bcc ?? '',
         subject: data.subject ?? '',
-        body: data.body ?? '',
+        bodyHtml: data.bodyHtml ?? '',
         updatedAt: new Date(),
       })
       .where(and(eq(email.id, params.id), eq(email.userId, session.user.id)))

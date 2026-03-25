@@ -151,10 +151,9 @@ export async function ensureBodyLoaded(
     creds,
     folderPath
   );
-  const preview = bodyText.slice(0, 150);
   const [updated] = await db
     .update(email)
-    .set({ bodyHtml, bodyText, preview, updatedAt: new Date() })
+    .set({ bodyHtml, bodyText, updatedAt: new Date() })
     .where(eq(email.id, msg.id))
     .returning();
   return updated ?? msg;

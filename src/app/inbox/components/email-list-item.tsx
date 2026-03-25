@@ -87,7 +87,7 @@ export default function EmailListItem({
           {email.subject}
         </p>
         <p className="text-muted-foreground mt-0.5 truncate text-xs">
-          {email.preview}
+          {email.bodyText?.slice(0, 150)}
         </p>
       </div>
     </button>
