@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { InternalTag } from "@/types/email";
 
 export const InternalTagSchema = z.enum(InternalTag);
@@ -28,13 +28,47 @@ export const ApiEmailSchema = z.object({
 export type ApiEmail = z.infer<typeof ApiEmailSchema>;
 
 export const EmailDataSchema = z.object({
+  tagId: z.string().optional(),
+  internalTag: z.nativeEnum(InternalTag).optional(),
   to: z.string().optional(),
   cc: z.string().optional(),
   bcc: z.string().optional(),
   subject: z.string().optional(),
   body: z.string().optional(),
-  tagId: z.string().optional(),
-  internalTag: InternalTagSchema.optional(),
 });
 
 export type EmailData = z.infer<typeof EmailDataSchema>;
+
+export const DraftDataSchema = z.object({
+  to: z.string().optional(),
+  cc: z.string().optional(),
+  bcc: z.string().optional(),
+  subject: z.string().optional(),
+  body: z.string().optional(),
+});
+
+export type DraftData = z.infer<typeof DraftDataSchema>;
+
+export const SendEmailSchema = z.object({
+  to: z.string(),
+  cc: z.string().optional(),
+  bcc: z.string().optional(),
+  subject: z.string().optional(),
+  body: z.string().optional(),
+  simulateReceive: z.boolean().optional(),
+});
+
+export type SendEmailData = z.infer<typeof SendEmailSchema>;
+
+export const MessageFlagsSchema = z.object({
+  read: z.boolean().optional(),
+  starred: z.boolean().optional(),
+});
+
+export type MessageFlags = z.infer<typeof MessageFlagsSchema>;
+
+export const InboxQuerySchema = z.object({
+  folderId: z.string(),
+});
+
+export type InboxQuery = z.infer<typeof InboxQuerySchema>;

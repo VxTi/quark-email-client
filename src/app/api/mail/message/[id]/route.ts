@@ -1,13 +1,10 @@
-import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { createRoute } from "@/lib/api-route";
 import { getMailAccountById } from "@/lib/mail/account";
 import { getFolderById } from "@/lib/mail/folders";
 import { ensureBodyLoaded, getMessageById, updateMessageFlags } from "@/lib/mail/messages";
-
-async function getSession() {
-  return auth.api.getSession({ headers: await headers() });
-}
+import { z } from "zod/v4";
+import { MessageFlagsSchema } from "@/models";
 
 async function loadMessage(id: string, userId: string) {
   const msg = await getMessageById(id, userId);
@@ -20,28 +17,31 @@ async function loadMessage(id: string, userId: string) {
   return ensureBodyLoaded(msg, account, folder.path);
 }
 
-export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getSession();
-  if (!session) return new NextResponse("Unauthorized", { status: 401 });
-  const { id } = await params;
-  const msg = await loadMessage(id, session.user.id);
-  if (!msg) return new NextResponse("Not found", { status: 404 });
-  return NextResponse.json(msg);
-}
+const paramsValidator = z.object({
+  id: z.string(),
+});
 
-function buildFlagUpdate(data: Record<string, unknown>) {
-  const update: { read?: boolean; starred?: boolean } = {};
-  if (typeof data.read === "boolean") update.read = data.read;
-  if (typeof data.starred === "boolean") update.starred = data.starred;
-  return update;
-}
+export const GET = createRoute({
+  requiresAuthentication: true,
+  strict: true,
+  paramsValidator,
+  handler: async ({ session, params }) => {
+    const msg = await loadMessage(params.id, session.user.id);
+    if (!msg) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json(msg);
+  },
+});
 
-export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getSession();
-  if (!session) return new NextResponse("Unauthorized", { status: 401 });
-  const { id } = await params;
-  const data = (await req.json()) as Record<string, unknown>;
-  const updated = await updateMessageFlags(id, session.user.id, buildFlagUpdate(data));
-  if (!updated) return new NextResponse("Not found", { status: 404 });
-  return NextResponse.json(updated);
-}
+export const PATCH = createRoute({
+  requiresAuthentication: true,
+  strict: true,
+  paramsValidator,
+  requestValidator: {
+    validator: MessageFlagsSchema,
+  },
+  handler: async ({ session, data, params }) => {
+    const updated = await updateMessageFlags(params.id, session.user.id, data);
+    if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json(updated);
+  },
+});

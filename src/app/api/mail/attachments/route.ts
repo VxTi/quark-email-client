@@ -1,15 +1,10 @@
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { mkdir, writeFile } from "node:fs/promises";
-import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { createRoute } from "@/lib/api-route";
 import { db } from "@/db";
 import { attachment } from "@/db/schema";
-
-async function getSession() {
-  return auth.api.getSession({ headers: await headers() });
-}
 
 async function ensureAttachmentDir() {
   const dir = join(tmpdir(), "mail-attachments");
@@ -36,12 +31,13 @@ async function stageAttachment(file: File) {
   return row;
 }
 
-export async function POST(req: Request) {
-  const session = await getSession();
-  if (!session) return new NextResponse("Unauthorized", { status: 401 });
-  const formData = await req.formData();
-  const file = formData.get("file");
-  if (!(file instanceof File)) return new NextResponse("Missing file", { status: 400 });
-  const staged = await stageAttachment(file);
-  return NextResponse.json(staged, { status: 201 });
-}
+export const POST = createRoute({
+  requiresAuthentication: true,
+  handler: async ({ request }) => {
+    const formData = await request.formData();
+    const file = formData.get("file");
+    if (!(file instanceof File)) return NextResponse.json({ error: "Missing file" }, { status: 400 });
+    const staged = await stageAttachment(file);
+    return NextResponse.json(staged, { status: 201 });
+  },
+});

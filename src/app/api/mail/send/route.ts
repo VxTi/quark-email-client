@@ -1,26 +1,14 @@
-import { headers } from "next/headers";
-import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { createRoute } from "@/lib/api-route";
 import { db } from "@/db";
 import { email } from "@/db/schema";
 import { getMailAccount } from "@/lib/mail/account";
 import { createSmtpTransport } from "@/lib/mail/smtp-client";
 import { InternalTag } from "@/types/email";
 import type { MailAccount } from "@/db/schema";
+import { NextResponse } from "next/server";
+import { SendEmailSchema, type SendEmailData } from "@/models";
 
-async function getSession() {
-  return auth.api.getSession({ headers: await headers() });
-}
-
-interface SendData {
-  to: string;
-  cc?: string;
-  bcc?: string;
-  subject?: string;
-  body?: string;
-}
-
-async function dispatchEmail(account: MailAccount, data: SendData) {
+async function dispatchEmail(account: MailAccount, data: SendEmailData) {
   const transport = createSmtpTransport(account);
   return transport.sendMail({
     from: account.email,
@@ -32,7 +20,7 @@ async function dispatchEmail(account: MailAccount, data: SendData) {
   });
 }
 
-function buildSentValues(userId: string, accountId: string, data: SendData) {
+function buildSentValues(userId: string, accountId: string, data: SendEmailData) {
   return {
     id: crypto.randomUUID(),
     userId,
@@ -50,17 +38,43 @@ function buildSentValues(userId: string, accountId: string, data: SendData) {
   };
 }
 
-async function recordSentEmail(userId: string, accountId: string, data: SendData) {
+async function recordSentEmail(
+  userId: string,
+  accountId: string,
+  data: SendEmailData,
+) {
   return db.insert(email).values(buildSentValues(userId, accountId, data));
 }
 
-export async function POST(req: Request) {
-  const session = await getSession();
-  if (!session) return new NextResponse("Unauthorized", { status: 401 });
-  const data = (await req.json()) as SendData;
-  const account = await getMailAccount(session.user.id);
-  if (!account) return new NextResponse("No mail account configured", { status: 404 });
-  await dispatchEmail(account, data);
-  await recordSentEmail(session.user.id, account.id, data);
-  return new NextResponse(null, { status: 204 });
-}
+export const POST = createRoute({
+  requiresAuthentication: true,
+  strict: true,
+  requestValidator: {
+    validator: SendEmailSchema,
+  },
+  handler: async ({ session, data }) => {
+    const account = await getMailAccount(session.user.id);
+
+    if (!account) {
+      return NextResponse.json({ error: "No mail account configured" }, { status: 404 });
+    }
+    if (data.simulateReceive) {
+      const receivedValues = {
+        ...buildSentValues(session.user.id, account.id, data),
+        internalTag: InternalTag.Inbox,
+        fromAddress: data.to,
+        fromName: "Simulation Bot",
+        to: account.email,
+        read: false,
+      };
+      await db.insert(email).values(receivedValues);
+
+      return NextResponse.json({ status: "Success" }, { status: 204 });
+    }
+
+    await dispatchEmail(account, data);
+    await recordSentEmail(session.user.id, account.id, data);
+
+    return NextResponse.json({ status: "Success" }, { status: 204 });
+  },
+});

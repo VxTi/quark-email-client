@@ -9,6 +9,7 @@ import type React from "react";
 import { useMemo, useRef, useState } from "react";
 import ResponseInputToolbar from "@/app/inbox/components/reply-composer/response-input-toolbar";
 import Button from "@/components/ui/button";
+import { sendEmail } from "@/lib/requests/mail";
 
 export interface ComposeFormProps {
   to: string;
@@ -39,6 +40,8 @@ interface ComposeFooterProps {
   fileRef: React.RefObject<HTMLInputElement | null>;
   onAttach: () => void;
   onFiles: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onSend: () => void;
+  sending: boolean;
 }
 
 function ComposeFieldRow({ label, value, onChange }: FieldRowProps) {
@@ -133,7 +136,7 @@ function ComposeAttachmentList({
   );
 }
 
-function ComposeBodyFooter({ fileRef, onAttach, onFiles }: ComposeFooterProps) {
+function ComposeBodyFooter({ fileRef, onAttach, onFiles, onSend, sending }: ComposeFooterProps) {
   return (
     <div className="flex items-center justify-between px-4 py-3 border-t border-border shrink-0">
       <div className="flex">
@@ -142,7 +145,9 @@ function ComposeBodyFooter({ fileRef, onAttach, onFiles }: ComposeFooterProps) {
           📎
         </Button>
       </div>
-      <Button>Send</Button>
+      <Button onClick={onSend} disabled={sending}>
+        {sending ? "Sending..." : "Send"}
+      </Button>
     </div>
   );
 }
@@ -161,13 +166,53 @@ function ComposeBodyEditor({ editor }: { editor: ReturnType<typeof createEditor>
   );
 }
 
-function ComposeBody() {
+function ComposeBody({
+  to,
+  cc,
+  bcc,
+  subject,
+  onClose,
+}: {
+  to: string;
+  cc: string;
+  bcc: string;
+  subject: string;
+  onClose: () => void;
+}) {
   const { editor, attachments, fileRef, onAttach, onFiles, remove } = useComposeBody();
+  const [sending, setSending] = useState(false);
+
+  const onSend = async () => {
+    setSending(true);
+    try {
+      await sendEmail({
+        to,
+        cc,
+        bcc,
+        subject,
+        body: editor.getDocHTML(),
+      });
+
+      onClose();
+    } catch (error) {
+      console.error(error);
+      alert("Failed to send email");
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       <ComposeBodyEditor editor={editor} />
       <ComposeAttachmentList attachments={attachments} onRemove={remove} />
-      <ComposeBodyFooter fileRef={fileRef} onAttach={onAttach} onFiles={onFiles} />
+      <ComposeBodyFooter
+        fileRef={fileRef}
+        onAttach={onAttach}
+        onFiles={onFiles}
+        onSend={onSend}
+        sending={sending}
+      />
     </div>
   );
 }
@@ -177,7 +222,7 @@ export default function ComposeView({ onClose, ...form }: Props) {
     <div className="flex-1 flex flex-col h-full overflow-hidden">
       <ComposeViewHeader onClose={onClose} />
       <ComposeFormFields {...form} />
-      <ComposeBody />
+      <ComposeBody {...form} onClose={onClose} />
     </div>
   );
 }

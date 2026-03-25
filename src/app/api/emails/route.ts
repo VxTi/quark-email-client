@@ -1,23 +1,19 @@
 import { eq } from "drizzle-orm";
-import { headers } from "next/headers";
 import { NextResponse } from "next/server";
+import { createRoute } from "@/lib/api-route";
 import { db } from "@/db";
 import { email } from "@/db/schema";
-import { auth } from "@/lib/auth";
 import { InternalTag } from "@/types/email";
+import { EmailDataSchema, type EmailData } from "@/models";
 
-async function getSession() {
-  return auth.api.getSession({ headers: await headers() });
-}
-
-async function insertEmail(userId: string, data: Record<string, string>) {
+async function insertEmail(userId: string, data: EmailData) {
   return db
     .insert(email)
     .values({
       id: crypto.randomUUID(),
       userId,
       tagId: data.tagId,
-      internalTag: (data.internalTag as InternalTag) ?? InternalTag.Draft,
+      internalTag: data.internalTag ?? InternalTag.Draft,
       to: data.to ?? "",
       cc: data.cc ?? "",
       bcc: data.bcc ?? "",
@@ -29,17 +25,22 @@ async function insertEmail(userId: string, data: Record<string, string>) {
     .returning();
 }
 
-export async function GET() {
-  const session = await getSession();
-  if (!session) return new NextResponse("Unauthorized", { status: 401 });
-  const emails = await db.select().from(email).where(eq(email.userId, session.user.id));
-  return NextResponse.json(emails);
-}
+export const GET = createRoute({
+  requiresAuthentication: true,
+  handler: async ({ session }) => {
+    const emails = await db.select().from(email).where(eq(email.userId, session.user.id));
+    return NextResponse.json(emails);
+  },
+});
 
-export async function POST(req: Request) {
-  const session = await getSession();
-  if (!session) return new NextResponse("Unauthorized", { status: 401 });
-  const data = await req.json();
-  const [newEmail] = await insertEmail(session.user.id, data);
-  return NextResponse.json(newEmail);
-}
+export const POST = createRoute({
+  requiresAuthentication: true,
+  strict: true,
+  requestValidator: {
+    validator: EmailDataSchema,
+  },
+  handler: async ({ session, data }) => {
+    const [newEmail] = await insertEmail(session.user.id, data);
+    return NextResponse.json(newEmail);
+  },
+});

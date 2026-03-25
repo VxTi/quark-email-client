@@ -1,38 +1,36 @@
 import { eq } from "drizzle-orm";
-import { headers } from "next/headers";
 import { NextResponse } from "next/server";
+import { createRoute } from "@/lib/api-route";
 import { db } from "@/db";
 import { tag } from "@/db/schema";
-import { auth } from "@/lib/auth";
+import { CreateTagSchema } from "@/models";
 
-export async function GET() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-  if (!session) return new NextResponse("Unauthorized", { status: 401 });
+export const GET = createRoute({
+  requiresAuthentication: true,
+  handler: async ({ session }) => {
+    const tags = await db.select().from(tag).where(eq(tag.userId, session.user.id));
+    return NextResponse.json(tags);
+  },
+});
 
-  const tags = await db.select().from(tag).where(eq(tag.userId, session.user.id));
+export const POST = createRoute({
+  requiresAuthentication: true,
+  strict: true,
+  requestValidator: {
+    validator: CreateTagSchema,
+  },
+  handler: async ({ session, data }) => {
+    const newTag = await db
+      .insert(tag)
+      .values({
+        id: crypto.randomUUID(),
+        name: data.name,
+        color: data.color ?? "#E5E7EB",
+        userId: session.user.id,
+        createdAt: new Date(),
+      })
+      .returning();
 
-  return NextResponse.json(tags);
-}
-
-export async function POST(req: Request) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-  if (!session) return new NextResponse("Unauthorized", { status: 401 });
-
-  const { name, color } = await req.json();
-  const newTag = await db
-    .insert(tag)
-    .values({
-      id: crypto.randomUUID(),
-      name,
-      color: color ?? "#E5E7EB",
-      userId: session.user.id,
-      createdAt: new Date(),
-    })
-    .returning();
-
-  return NextResponse.json(newTag[0]);
-}
+    return NextResponse.json(newTag[0]);
+  },
+});

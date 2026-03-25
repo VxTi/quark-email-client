@@ -1,13 +1,8 @@
-import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { createRoute } from "@/lib/api-route";
 import { getMailAccount } from "@/lib/mail/account";
 import { syncFolders, getFolders } from "@/lib/mail/folders";
 import { fetchEnvelopes } from "@/lib/mail/messages";
-
-async function getSession() {
-  return auth.api.getSession({ headers: await headers() });
-}
 
 async function syncAccount(userId: string) {
   const account = await getMailAccount(userId);
@@ -18,9 +13,17 @@ async function syncAccount(userId: string) {
   return { folderCount: folders.length };
 }
 
-export async function POST() {
-  const session = await getSession();
-  if (!session) return new NextResponse("Unauthorized", { status: 401 });
-  const result = await syncAccount(session.user.id);
-  return NextResponse.json(result);
-}
+export const POST = createRoute({
+  requiresAuthentication: true,
+  handler: async ({ session }) => {
+    try {
+      const result = await syncAccount(session.user.id);
+      return NextResponse.json(result);
+    } catch (error) {
+      if (error instanceof Error && error.message === "No mail account configured") {
+        return NextResponse.json({ error: error.message }, { status: 404 });
+      }
+      throw error;
+    }
+  },
+});

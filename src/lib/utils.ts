@@ -23,6 +23,11 @@ export async function request<T>(
   if (!res.ok) {
     throw new Error(`Request failed with status ${res.status}`);
   }
+
+  if (res.status === 204) {
+    return config.decoder.parse(null);
+  }
+
   const data: unknown = await res.json();
 
   return config.decoder.parse(data);
