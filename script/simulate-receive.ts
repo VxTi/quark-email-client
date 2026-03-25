@@ -1,16 +1,16 @@
-import { config } from "dotenv";
-import path from "path";
+import { config } from 'dotenv';
+import path from 'path';
 
-config({ path: path.resolve(process.cwd(), ".env.local") });
+config({ path: path.resolve(process.cwd(), '.env.local') });
 
-import { db } from "@/db";
-import { email, account } from "@/db/schema";
-import { InternalTag } from "@/types/email";
+import { db } from '@/db';
+import { email, account } from '@/db/schema';
+import { InternalTag } from '@/types/email';
 
 async function simulateReceive() {
   const [acc] = await db.select().from(account).limit(1);
   if (!acc) {
-    console.error("No mail account found to simulate receiving email.");
+    console.error('No mail account found to simulate receiving email.');
     process.exit(1);
   }
 
@@ -22,12 +22,12 @@ async function simulateReceive() {
     userId: acc.userId,
     accountId: acc.id,
     internalTag: InternalTag.Inbox,
-    fromAddress: "simulation@example.com",
-    fromName: "Simulation Bot",
+    fromAddress: 'simulation@example.com',
+    fromName: 'Simulation Bot',
     to: acc.accountId,
-    subject: "Hello from Simulation!",
-    body: "<p>This is a simulated email body.</p>",
-    preview: "This is a simulated email body.",
+    subject: 'Hello from Simulation!',
+    body: '<p>This is a simulated email body.</p>',
+    preview: 'This is a simulated email body.',
     read: false,
     starred: false,
     createdAt: new Date(),
@@ -39,7 +39,10 @@ async function simulateReceive() {
     ...payload,
   });
 
-  console.log("Simulated email received (inserted into Inbox) for", acc.accountId);
+  console.log(
+    'Simulated email received (inserted into Inbox) for',
+    acc.accountId
+  );
 }
 
 simulateReceive().catch(console.error);

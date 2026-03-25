@@ -12,6 +12,7 @@ interface EmailContextType {
   updateEmailTags: (id: string, tags: Tag[]) => void;
   deleteEmails: (ids: string[]) => void;
   addEmail: (email: ApiEmail) => void;
+  refresh: () => Promise<void>;
 }
 
 const EmailContext = createContext<EmailContextType | undefined>(undefined);
@@ -47,10 +48,13 @@ function toUiEmail(api: ApiEmail): Email {
 export function EmailProvider({ children }: { children: ReactNode }) {
   const [emails, setEmails] = useState<Email[]>([]);
 
+  const refresh = async () => {
+    const apiEmails = await fetchEmails();
+    setEmails(apiEmails.map(toUiEmail));
+  };
+
   useEffect(() => {
-    void fetchEmails().then(apiEmails => {
-      setEmails(apiEmails.map(toUiEmail));
-    });
+    void refresh();
   }, []);
 
   const addEmail = (apiEmail: ApiEmail) => {
@@ -67,7 +71,7 @@ export function EmailProvider({ children }: { children: ReactNode }) {
 
   return (
     <EmailContext.Provider
-      value={{ emails, setEmails, updateEmailTags, deleteEmails, addEmail }}
+      value={{ emails, setEmails, updateEmailTags, deleteEmails, addEmail, refresh }}
     >
       {children}
     </EmailContext.Provider>

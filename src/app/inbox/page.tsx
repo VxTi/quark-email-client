@@ -54,9 +54,13 @@ function useComposing(form: { isDirty: boolean; reset: () => void }) {
   return { composing, setComposing, pending, close, requestSelect };
 }
 
-function useFilter() {
+function useFilter(refresh: () => Promise<void>) {
   const [filter, setFilter] = useState<ActiveFilter>(null);
-  return { filter, setFilter };
+  const onFilter = (next: ActiveFilter) => {
+    setFilter(next);
+    if (next?.kind === 'mailbox') void refresh();
+  };
+  return { filter, onFilter };
 }
 
 function useConfirmSave(
@@ -97,7 +101,8 @@ function useInboxState(form: ReturnType<typeof useComposeForm>) {
 export default function InboxPage() {
   const form = useComposeForm();
   const state = useInboxState(form);
-  const { filter, setFilter } = useFilter();
+  const { refresh } = useEmails();
+  const { filter, onFilter } = useFilter(refresh);
   return (
     <div className="bg-background flex h-screen overflow-hidden">
       <Sidebar
@@ -105,7 +110,7 @@ export default function InboxPage() {
           state.setComposing(true);
         }}
         filter={filter}
-        onFilter={setFilter}
+        onFilter={onFilter}
       />
       <EmailList
         emails={state.emails}

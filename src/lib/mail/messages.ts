@@ -73,6 +73,7 @@ async function upsertMessage(values: ReturnType<typeof buildEmailValues>) {
     .onConflictDoUpdate({
       target: [email.folderId, email.uid],
       set: {
+        internalTag: values.internalTag,
         read: values.read,
         starred: values.starred,
         updatedAt: new Date(),

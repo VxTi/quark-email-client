@@ -4,7 +4,7 @@ import path from 'path';
 import pg from 'pg';
 import * as schema from './schema';
 
-config({ path: path.resolve(process.cwd(), '.env.local') });
+config({ path: path.resolve(process.cwd(), '.env.local'), quiet: true });
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is not defined');

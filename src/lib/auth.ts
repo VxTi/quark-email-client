@@ -30,6 +30,8 @@ const sendSmsOtp = async ({
   console.log(`[DEV] SMS OTP for ${user.email}: ${otp}`);
 };
 
+const mailHost = process.env.MAIL_HOST!;
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: 'pg', schema }),
   databaseHooks: {
@@ -43,10 +45,10 @@ export const auth = betterAuth({
             providerId: 'email',
             displayName: user.name || user.email.split('@')[0],
             password: encrypt('simulation-password'),
-            imapHost: 'imap.example.com',
+            imapHost: mailHost,
             imapPort: 993,
             imapSecure: true,
-            smtpHost: 'smtp.example.com',
+            smtpHost: mailHost,
             smtpPort: 465,
             smtpSecure: true,
             createdAt: new Date(),
