@@ -7,9 +7,11 @@ export interface ImapCredentials {
   password: string | null;
 }
 
+const mailHost = process.env.MAIL_HOST ?? '';
+
 function buildImapClient(creds: ImapCredentials): ImapFlow {
   return new ImapFlow({
-    host: process.env.MAIL_HOST!,
+    host: mailHost,
     port: 993,
     secure: true,
     auth: { user: creds.accountId, pass: decrypt(creds.password ?? '') },

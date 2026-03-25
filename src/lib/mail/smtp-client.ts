@@ -7,9 +7,11 @@ export interface SmtpCredentials {
   password: string | null;
 }
 
+const mailHost = process.env.MAIL_HOST ?? '';
+
 export function createSmtpTransport(creds: SmtpCredentials) {
   return nodemailer.createTransport({
-    host: process.env.MAIL_HOST!,
+    host: mailHost,
     port: 587,
     secure: false,
     auth: { user: creds.accountId, pass: decrypt(creds.password ?? '') },

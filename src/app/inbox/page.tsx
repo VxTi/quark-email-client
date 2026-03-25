@@ -1,13 +1,14 @@
 'use client';
-import { useState }    from 'react';
+import { useRef, useState } from 'react';
 import CreateEmailView from '@/app/inbox/components/create-email-view';
 import EmailList       from '@/app/inbox/components/email-list';
 import EmailViewer from '@/app/inbox/components/email-viewer';
 import SaveEmailDialog from '@/app/inbox/components/save-email-dialog';
 import Sidebar from '@/app/inbox/components/sidebar';
 import { useEmails } from '@/lib/email-context';
-import { InternalTag, type ActiveFilter } from '@/types/email';
-import { saveEmail } from '@/lib/requests/emails';
+import { saveDraft } from '@/lib/requests/mail';
+import { type DraftData } from '@/models/email';
+import { type ActiveFilter } from '@/types/email';
 import type { Email } from '@/types/email';
 
 function useComposeForm() {
@@ -66,30 +67,31 @@ function useFilter(refresh: () => Promise<void>) {
 function useConfirmSave(
   form: ReturnType<typeof useComposeForm>,
   comp: ReturnType<typeof useComposing>,
-  setSelected: (e: Email | null) => void
+  setSelected: (e: Email | null) => void,
+  getBody: React.MutableRefObject<() => string>
 ) {
   const { addEmail } = useEmails();
   return async (save: boolean) => {
     if (save) {
-      const saved = await saveEmail({
-        to: form.to,
-        cc: form.cc,
-        bcc: form.bcc,
-        subject: form.subject,
-        internalTag: InternalTag.Draft,
-      });
-      addEmail(saved);
+      const data: DraftData = {
+        to: form.to, cc: form.cc, bcc: form.bcc,
+        subject: form.subject, body: getBody.current(),
+      };
+      addEmail(await saveDraft(data));
     }
     setSelected(comp.pending);
     comp.close();
   };
 }
 
-function useInboxState(form: ReturnType<typeof useComposeForm>) {
+function useInboxState(
+  form: ReturnType<typeof useComposeForm>,
+  getBody: React.MutableRefObject<() => string>
+) {
   const { emails, deleteEmails } = useEmails();
   const [selected, setSelected] = useState<Email | null>(null);
   const comp = useComposing(form);
-  const confirm = useConfirmSave(form, comp, setSelected);
+  const confirm = useConfirmSave(form, comp, setSelected, getBody);
   const onSelect = (email: Email) => {
     if (comp.requestSelect(email)) return;
     setSelected(email);
@@ -98,11 +100,20 @@ function useInboxState(form: ReturnType<typeof useComposeForm>) {
   return { emails, selected, deleteEmails, ...comp, confirm, onSelect };
 }
 
+function useDraftSaver() {
+  const { addEmail } = useEmails();
+  return async (data: DraftData) => {
+    addEmail(await saveDraft(data));
+  };
+}
+
 export default function InboxPage() {
   const form = useComposeForm();
-  const state = useInboxState(form);
+  const getBodyRef = useRef<() => string>(() => '');
+  const state = useInboxState(form, getBodyRef);
   const { refresh } = useEmails();
   const { filter, onFilter } = useFilter(refresh);
+  const onSave = useDraftSaver();
   return (
     <div className="bg-background flex h-screen overflow-hidden">
       <Sidebar
@@ -120,7 +131,7 @@ export default function InboxPage() {
         filter={filter}
       />
       {state.composing ? (
-        <CreateEmailView onClose={state.close} {...form} />
+        <CreateEmailView onClose={state.close} onSave={onSave} getBodyRef={getBodyRef} {...form} />
       ) : (
         <EmailViewer email={state.selected} />
       )}
