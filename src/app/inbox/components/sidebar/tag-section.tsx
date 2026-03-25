@@ -1,4 +1,5 @@
 "use client";
+import SidebarSection from "@/app/inbox/components/sidebar/sidebar-section";
 import { motion } from "framer-motion";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
@@ -51,7 +52,8 @@ export default function TagSection({ filter, onFilter }: Props) {
   const handleFilter = (value: string) =>
     onFilter(filter?.kind === "tag" && filter.value === value ? null : { kind: "tag", value });
   return (
-    <div className="flex flex-col gap-1 mt-4">
+    <SidebarSection>
+      {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
       <TagHeader onCreate={createTag} />
       {sortedTags.map((tag) => (
         <SidebarItem
@@ -62,6 +64,6 @@ export default function TagSection({ filter, onFilter }: Props) {
           onClick={() => handleFilter(tag.name)}
         />
       ))}
-    </div>
+    </SidebarSection>
   );
 }

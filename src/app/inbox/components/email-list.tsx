@@ -91,9 +91,9 @@ function applyFilters(emails: Email[], filter: ActiveFilter, query: string): Ema
 }
 
 function useDragListeners(
-  dragging: React.MutableRefObject<boolean>,
-  startX: React.MutableRefObject<number>,
-  startWidth: React.MutableRefObject<number>,
+  dragging: React.RefObject<boolean>,
+  startX: React.RefObject<number>,
+  startWidth: React.RefObject<number>,
   setWidth: (w: number) => void,
 ) {
   useEffect(() => {
@@ -170,7 +170,12 @@ function useEmailListState() {
   const toggleId = (id: string) =>
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
       return next;
     });
   const exitSelect = () => {

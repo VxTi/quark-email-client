@@ -5,6 +5,7 @@ import { emailOTP, twoFactor } from "better-auth/plugins";
 import { passkey } from "@better-auth/passkey";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
+import { encrypt } from "./mail/encryption";
 
 const sendVerificationOTP = async ({
   email,
@@ -25,6 +26,30 @@ const sendSmsOtp = async ({ user, otp }: { user: { email: string }; otp: string 
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg", schema }),
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          await db.insert(schema.account).values({
+            id: crypto.randomUUID(),
+            userId: user.id,
+            accountId: user.email,
+            providerId: "email",
+            displayName: user.name || user.email.split("@")[0],
+            password: encrypt("simulation-password"),
+            imapHost: "imap.example.com",
+            imapPort: 993,
+            imapSecure: true,
+            smtpHost: "smtp.example.com",
+            smtpPort: 465,
+            smtpSecure: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+        },
+      },
+    },
+  },
   emailAndPassword: { enabled: true },
   plugins: [
     emailOTP({ sendVerificationOTP }),

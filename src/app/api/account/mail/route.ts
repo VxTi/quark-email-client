@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { createRoute } from "@/lib/api-route";
 import { createMailAccount } from "@/lib/mail/account";
-import { CreateMailAccountSchema } from "@/models";
+import { CreateAccountSchema } from "@/models";
 
 export const POST = createRoute({
   requiresAuthentication: true,
   strict: true,
   requestValidator: {
-    validator: CreateMailAccountSchema,
+    validator: CreateAccountSchema,
     in: "body",
   },
   handler: async ({ session, data }) => {

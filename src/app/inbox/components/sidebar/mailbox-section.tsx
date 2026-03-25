@@ -1,4 +1,6 @@
 "use client";
+import SidebarSection from "@/app/inbox/components/sidebar/sidebar-section";
+import SidebarSectionTitle from "@/app/inbox/components/sidebar/sidebar-section-title";
 import {
   type LucideIcon,
   MessageCircleIcon,
@@ -8,7 +10,6 @@ import {
 } from "lucide-react";
 import { type ActiveFilter, InternalTag } from "@/types/email";
 import SidebarItem from "./sidebar-item";
-import SidebarSectionTitle from "./sidebar-section-title";
 
 interface MailboxAction {
   icon: LucideIcon;
@@ -30,7 +31,7 @@ interface Props {
 
 export default function MailboxSection({ filter, onFilter }: Props) {
   return (
-    <div className="flex flex-col gap-1">
+    <SidebarSection>
       <SidebarSectionTitle title="Mailbox" />
       {MAILBOX_ACTIONS.map((action) => (
         <SidebarItem
@@ -41,6 +42,6 @@ export default function MailboxSection({ filter, onFilter }: Props) {
           onClick={() => onFilter({ kind: "mailbox", value: action.value })}
         />
       ))}
-    </div>
+    </SidebarSection>
   );
 }

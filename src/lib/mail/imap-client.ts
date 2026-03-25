@@ -3,19 +3,19 @@ import { ImapFlow } from "imapflow";
 import { decrypt } from "./encryption";
 
 export interface ImapCredentials {
-  imapHost: string;
-  imapPort: number;
-  imapSecure: boolean;
-  email: string;
-  encryptedPassword: string | null;
+  imapHost: string | null;
+  imapPort: number | null;
+  imapSecure: boolean | null;
+  accountId: string;
+  password: string | null;
 }
 
 function buildImapClient(creds: ImapCredentials): ImapFlow {
   return new ImapFlow({
-    host: creds.imapHost,
-    port: creds.imapPort,
-    secure: creds.imapSecure,
-    auth: { user: creds.email, pass: decrypt(creds.encryptedPassword ?? "") },
+    host: creds.imapHost ?? "",
+    port: creds.imapPort ?? 993,
+    secure: creds.imapSecure ?? true,
+    auth: { user: creds.accountId, pass: decrypt(creds.password ?? "") },
     logger: false,
   });
 }

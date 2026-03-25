@@ -1,5 +1,7 @@
 "use client";
 
+import { cn } from "@/lib/utils";
+
 interface Props {
   label: string;
   count?: number;
@@ -8,13 +10,15 @@ interface Props {
 }
 
 export default function SidebarItem({ label, count, active = false, onClick }: Props) {
-  const activeClass = active
-    ? "bg-primary text-primary-foreground font-semibold"
-    : "text-foreground hover:bg-background";
   return (
     <button
       onClick={onClick}
-      className={`w-full text-left px-3 py-2 rounded-md text-sm flex justify-between items-center transition-colors ${activeClass}`}
+      className={cn(
+        "w-full text-left px-3 py-2 rounded-md text-sm flex justify-between items-center transition-colors",
+        active
+          ? "bg-primary text-primary-foreground font-semibold"
+          : "text-foreground hover:bg-background",
+      )}
     >
       <span>{label}</span>
       {count !== undefined && <span className="text-xs text-muted-foreground">{count}</span>}

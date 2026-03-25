@@ -1,20 +1,23 @@
 import "server-only";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { db } from "@/db";
-import { mailAccount } from "@/db/schema";
+import { account } from "@/db/schema";
 import { encrypt } from "./encryption";
 
 export async function getMailAccount(userId: string) {
-  const [acc] = await db.select().from(mailAccount).where(eq(mailAccount.userId, userId));
+  const [acc] = await db
+    .select()
+    .from(account)
+    .where(and(eq(account.userId, userId), eq(account.providerId, "email")));
   return acc ?? null;
 }
 
 export async function getMailAccountById(id: string) {
-  const [acc] = await db.select().from(mailAccount).where(eq(mailAccount.id, id));
+  const [acc] = await db.select().from(account).where(eq(account.id, id));
   return acc ?? null;
 }
 
-interface CreateMailAccountData {
+interface CreateAccountData {
   displayName: string;
   email: string;
   password: string;
@@ -26,25 +29,26 @@ interface CreateMailAccountData {
   smtpSecure: boolean;
 }
 
-function buildAccountValues(userId: string, data: CreateMailAccountData) {
+function buildAccountValues(userId: string, data: CreateAccountData) {
   return {
     id: crypto.randomUUID(),
     userId,
+    accountId: data.email,
+    providerId: "email",
     displayName: data.displayName,
-    email: data.email,
     imapHost: data.imapHost,
     imapPort: data.imapPort,
     imapSecure: data.imapSecure,
     smtpHost: data.smtpHost,
     smtpPort: data.smtpPort,
     smtpSecure: data.smtpSecure,
-    encryptedPassword: encrypt(data.password),
+    password: encrypt(data.password),
     createdAt: new Date(),
     updatedAt: new Date(),
   };
 }
 
-export async function createMailAccount(userId: string, data: CreateMailAccountData) {
-  const [acc] = await db.insert(mailAccount).values(buildAccountValues(userId, data)).returning();
+export async function createMailAccount(userId: string, data: CreateAccountData) {
+  const [acc] = await db.insert(account).values(buildAccountValues(userId, data)).returning();
   return acc;
 }

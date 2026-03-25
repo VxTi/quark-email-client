@@ -58,6 +58,16 @@ export const account = pgTable("account", {
   password: text("password"),
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
+  displayName: text("display_name").notNull().default(""),
+  imapHost: text("imap_host"),
+  imapPort: integer("imap_port"),
+  imapSecure: boolean("imap_secure").default(true),
+  smtpHost: text("smtp_host"),
+  smtpPort: integer("smtp_port"),
+  smtpSecure: boolean("smtp_secure").default(true),
+  encryptedAccessToken: text("encrypted_access_token"),
+  encryptedRefreshToken: text("encrypted_refresh_token"),
+  tokenExpiresAt: timestamp("token_expires_at"),
 });
 
 export const verification = pgTable("verification", {
@@ -95,34 +105,13 @@ export const tag = pgTable("tag", {
   createdAt: timestamp("created_at").notNull(),
 });
 
-export const mailAccount = pgTable("mail_account", {
-  id: text("id").primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  displayName: text("display_name").notNull().default(""),
-  email: text("email").notNull(),
-  imapHost: text("imap_host").notNull(),
-  imapPort: integer("imap_port").notNull(),
-  imapSecure: boolean("imap_secure").notNull().default(true),
-  smtpHost: text("smtp_host").notNull(),
-  smtpPort: integer("smtp_port").notNull(),
-  smtpSecure: boolean("smtp_secure").notNull().default(true),
-  encryptedPassword: text("encrypted_password"),
-  encryptedAccessToken: text("encrypted_access_token"),
-  encryptedRefreshToken: text("encrypted_refresh_token"),
-  tokenExpiresAt: timestamp("token_expires_at"),
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
-});
-
 export const folder = pgTable(
   "folder",
   {
     id: text("id").primaryKey(),
     accountId: text("account_id")
       .notNull()
-      .references(() => mailAccount.id, { onDelete: "cascade" }),
+      .references(() => account.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     path: text("path").notNull(),
     type: folderTypeEnum("type").notNull().default(FolderType.Custom),
@@ -142,7 +131,7 @@ export const email = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    accountId: text("account_id").references(() => mailAccount.id, { onDelete: "cascade" }),
+    accountId: text("account_id").references(() => account.id, { onDelete: "cascade" }),
     folderId: text("folder_id").references(() => folder.id, { onDelete: "set null" }),
     tagId: text("tag_id").references(() => tag.id, { onDelete: "set null" }),
     internalTag: internalTagEnum("internal_tag").notNull().default(InternalTag.Draft),
@@ -180,7 +169,7 @@ export const attachment = pgTable("attachment", {
   createdAt: timestamp("created_at").notNull(),
 });
 
-export type MailAccount = typeof mailAccount.$inferSelect;
+export type Account = typeof account.$inferSelect;
 export type Folder = typeof folder.$inferSelect;
 export type Email = typeof email.$inferSelect;
 export type Attachment = typeof attachment.$inferSelect;

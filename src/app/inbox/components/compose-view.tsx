@@ -196,7 +196,8 @@ function ComposeBody({
       onClose();
     } catch (error) {
       console.error(error);
-      alert("Failed to send email");
+      const message = error instanceof Error ? error.message : "Failed to send email";
+      alert(message);
     } finally {
       setSending(false);
     }

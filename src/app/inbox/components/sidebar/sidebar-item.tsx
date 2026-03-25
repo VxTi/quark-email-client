@@ -1,6 +1,7 @@
 "use client";
 import type { LucideIcon } from "lucide-react";
 import Button from "@/components/ui/button";
+import { twMerge } from "tailwind-merge";
 
 interface SidebarItemProps {
   icon?: LucideIcon;
@@ -20,7 +21,10 @@ export default function SidebarItem({
   return (
     <Button
       variant="ghost"
-      className={`w-full justify-start gap-2 ${active ? "bg-accent" : ""}`}
+      className={twMerge(
+        "w-full justify-start gap-2 hover:bg-accent hover:text-accent-foreground rounded-sm",
+        active && "bg-accent text-accent-foreground",
+      )}
       onClick={onClick}
     >
       <span className="flex h-4 w-4 items-center justify-center shrink-0">

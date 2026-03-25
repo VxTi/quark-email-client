@@ -1,6 +1,6 @@
 import { z } from "zod/v4";
 
-export const CreateMailAccountSchema = z.object({
+export const CreateAccountSchema = z.object({
   displayName: z.string(),
   email: z.string().email(),
   password: z.string(),
@@ -12,4 +12,4 @@ export const CreateMailAccountSchema = z.object({
   smtpSecure: z.boolean(),
 });
 
-export type CreateMailAccountData = z.infer<typeof CreateMailAccountSchema>;
+export type CreateAccountData = z.infer<typeof CreateAccountSchema>;

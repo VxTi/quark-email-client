@@ -4,14 +4,14 @@ import { email } from "@/db/schema";
 import { getMailAccount } from "@/lib/mail/account";
 import { createSmtpTransport } from "@/lib/mail/smtp-client";
 import { InternalTag } from "@/types/email";
-import type { MailAccount } from "@/db/schema";
 import { NextResponse } from "next/server";
 import { SendEmailSchema, type SendEmailData } from "@/models";
+import { type Account } from "@/db/schema";
 
-async function dispatchEmail(account: MailAccount, data: SendEmailData) {
+async function dispatchEmail(account: Account, data: SendEmailData) {
   const transport = createSmtpTransport(account);
   return transport.sendMail({
-    from: account.email,
+    from: account.accountId, // Using accountId as it contains the email address
     to: data.to,
     cc: data.cc,
     bcc: data.bcc,
@@ -38,11 +38,7 @@ function buildSentValues(userId: string, accountId: string, data: SendEmailData)
   };
 }
 
-async function recordSentEmail(
-  userId: string,
-  accountId: string,
-  data: SendEmailData,
-) {
+async function recordSentEmail(userId: string, accountId: string, data: SendEmailData) {
   return db.insert(email).values(buildSentValues(userId, accountId, data));
 }
 
@@ -64,7 +60,7 @@ export const POST = createRoute({
         internalTag: InternalTag.Inbox,
         fromAddress: data.to,
         fromName: "Simulation Bot",
-        to: account.email,
+        to: account.accountId,
         read: false,
       };
       await db.insert(email).values(receivedValues);

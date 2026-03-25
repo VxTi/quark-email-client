@@ -21,7 +21,7 @@ export async function request<T>(
 ): Promise<T> {
   const res = await fetch(url, config);
   if (!res.ok) {
-    throw new Error(`Request failed with status ${res.status}`);
+    throw new Error(`Request failed with status ${res.status}: ${res.statusText}`);
   }
 
   if (res.status === 204) {
