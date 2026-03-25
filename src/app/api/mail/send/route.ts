@@ -1,7 +1,7 @@
 import { createRoute } from '@/lib/api-route';
 import { db } from '@/db';
-import { email } from '@/db/schema';
-import { getMailAccount } from '@/lib/mail/account';
+import { email }               from '@/db/schema';
+import { getAccountByUserId }  from '@/lib/mail/account';
 import { createSmtpTransport } from '@/lib/mail/smtp-client';
 import { InternalTag } from '@/types/email';
 import { NextResponse } from 'next/server';
@@ -57,7 +57,7 @@ export const POST = createRoute({
     validator: SendEmailSchema,
   },
   handler: async ({ session, data }) => {
-    const account = await getMailAccount(session.user.id);
+    const account = await getAccountByUserId(session.user.id);
 
     if (!account) {
       return NextResponse.json(

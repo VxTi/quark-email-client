@@ -3,7 +3,7 @@ import { simpleParser } from 'mailparser';
 import { and, eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { email } from '@/db/schema';
-import { InternalTag } from '@/types/email';
+import { FolderType, InternalTag } from '@/types/email';
 import { withImapClient, type ImapCredentials } from './imap-client';
 import type { Email } from '@/db/schema';
 
@@ -37,10 +37,17 @@ function buildFromValues(msg: FetchedMessage) {
   };
 }
 
+const FOLDER_TO_INTERNAL_TAG: Partial<Record<FolderType, InternalTag>> = {
+  [FolderType.Sent]: InternalTag.Sent,
+  [FolderType.Drafts]: InternalTag.Draft,
+  [FolderType.Trash]: InternalTag.Trash,
+};
+
 function buildEmailValues(
   userId: string,
   accountId: string,
   folderId: string,
+  folderType: FolderType,
   msg: FetchedMessage
 ) {
   return {
@@ -49,7 +56,7 @@ function buildEmailValues(
     accountId,
     folderId,
     uid: String(msg.uid),
-    internalTag: InternalTag.Inbox,
+    internalTag: FOLDER_TO_INTERNAL_TAG[folderType] ?? InternalTag.Inbox,
     read: msg.flags?.has('\\Seen') ?? false,
     starred: msg.flags?.has('\\Flagged') ?? false,
     hasAttachments: (msg.bodyStructure?.childNodes?.length ?? 0) > 0,
@@ -79,6 +86,7 @@ export async function fetchEnvelopes(
   userId: string,
   accountId: string,
   folderId: string,
+  folderType: FolderType,
   creds: ImapCredentials,
   folderPath: string
 ) {
@@ -97,7 +105,7 @@ export async function fetchEnvelopes(
   });
   return Promise.all(
     msgs.map(m =>
-      upsertMessage(buildEmailValues(userId, accountId, folderId, m))
+      upsertMessage(buildEmailValues(userId, accountId, folderId, folderType, m))
     )
   );
 }

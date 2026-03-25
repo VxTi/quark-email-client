@@ -1,20 +1,25 @@
 import 'server-only';
 import { eq, and } from 'drizzle-orm';
 import { db } from '@/db';
-import { account } from '@/db/schema';
+import { type Account, account } from '@/db/schema';
 import { encrypt } from './encryption';
 
-export async function getMailAccount(userId: string) {
-  const [acc] = await db
+export async function getAccountByUserId(
+  userId: string
+): Promise<Account | null> {
+  return await db
     .select()
     .from(account)
-    .where(and(eq(account.userId, userId), eq(account.providerId, 'email')));
-  return acc ?? null;
+    .where(and(eq(account.userId, userId), eq(account.providerId, 'email')))
+    .then(res => res.at(0) ?? null);
 }
 
-export async function getMailAccountById(id: string) {
-  const [acc] = await db.select().from(account).where(eq(account.id, id));
-  return acc ?? null;
+export async function getAccountById(id: string): Promise<Account | null> {
+  return await db
+    .select()
+    .from(account)
+    .where(eq(account.id, id))
+    .then(res => res.at(0) ?? null);
 }
 
 interface CreateAccountData {

@@ -1,16 +1,16 @@
 import { NextResponse } from 'next/server';
-import { createRoute } from '@/lib/api-route';
-import { getMailAccount } from '@/lib/mail/account';
+import { createRoute }             from '@/lib/api-route';
+import { getAccountByUserId }      from '@/lib/mail/account';
 import { syncFolders, getFolders } from '@/lib/mail/folders';
 import { fetchEnvelopes } from '@/lib/mail/messages';
 
 async function syncAccount(userId: string) {
-  const account = await getMailAccount(userId);
+  const account = await getAccountByUserId(userId);
   if (!account) throw new Error('No mail account configured');
   await syncFolders(account.id, account);
   const folders = await getFolders(account.id);
   await Promise.all(
-    folders.map(f => fetchEnvelopes(userId, account.id, f.id, account, f.path))
+    folders.map(f => fetchEnvelopes(userId, account.id, f.id, f.type, account, f.path))
   );
   return { folderCount: folders.length };
 }

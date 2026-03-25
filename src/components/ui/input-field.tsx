@@ -34,7 +34,7 @@ export default function InputField({
             {...props}
           />
         }
-        className="border-border bg-card text-foreground focus:ring-ring/30 w-full rounded-xl border px-3 py-2 text-sm transition-shadow focus:ring-2 focus:outline-none"
+        className="border-border bg-card text-foreground focus:ring-ring/30 text-md w-full rounded-xl border-2 px-4 py-3 transition-shadow focus:ring-2 focus:outline-none"
       />
       {error && (
         <Field.Error className="text-xs text-red-500">{error}</Field.Error>

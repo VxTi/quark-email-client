@@ -7,6 +7,7 @@ import { createEditor } from 'prosekit/core';
 import { ProseKit } from 'prosekit/react';
 import React, { useMemo, useRef, useState } from 'react';
 import EmailInputMessageToolbar from '@/app/inbox/components/reply-composer/email-input-message-toolbar';
+import SaveEmailDialog from '@/app/inbox/components/save-email-dialog';
 import Button from '@/components/ui/button';
 import { sendEmail } from '@/lib/requests/mail';
 import { toast } from 'sonner';
@@ -96,11 +97,35 @@ function ComposeFormFields({
   );
 }
 
-function useComposeBody() {
-  const editor = useMemo(
-    () => createEditor({ extension: defineBasicExtension() }),
-    []
-  );
+function isEditorEmpty(editor: ReturnType<typeof createEditor>): boolean {
+  return editor.getDocHTML().replace(/<[^>]*>/g, '').trim() === '';
+}
+
+function hasFormContent({ to, cc, bcc, subject }: ComposeFormProps): boolean {
+  return !!(to || cc || bcc || subject);
+}
+
+function useCloseGuard(
+  form: ComposeFormProps,
+  editor: ReturnType<typeof createEditor>,
+  onClose: () => void
+) {
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+
+  const handleClose = () => {
+    const hasContent = hasFormContent(form) || !isEditorEmpty(editor);
+    hasContent ? setShowSaveDialog(true) : onClose();
+  };
+
+  const handleConfirm = (_save: boolean) => {
+    setShowSaveDialog(false);
+    onClose();
+  };
+
+  return { showSaveDialog, handleClose, handleConfirm };
+}
+
+function useComposeAttachments() {
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
   const onAttach = () => fileRef.current?.click();
@@ -112,7 +137,7 @@ function useComposeBody() {
   const remove = (name: string) => {
     setAttachments(prev => prev.filter(a => a.name !== name));
   };
-  return { editor, attachments, fileRef, onAttach, onFiles, remove };
+  return { attachments, fileRef, onAttach, onFiles, remove };
 }
 
 function ComposeAttachmentChip({
@@ -211,16 +236,18 @@ function ComposeBody({
   cc,
   bcc,
   subject,
+  editor,
   onClose,
 }: {
   to: string;
   cc: string;
   bcc: string;
   subject: string;
+  editor: ReturnType<typeof createEditor>;
   onClose: () => void;
 }) {
-  const { editor, attachments, fileRef, onAttach, onFiles, remove } =
-    useComposeBody();
+  const { attachments, fileRef, onAttach, onFiles, remove } =
+    useComposeAttachments();
   const [sending, setSending] = useState(false);
 
   const onSend = async () => {
@@ -260,11 +287,19 @@ function ComposeBody({
 }
 
 export default function CreateEmailView({ onClose, ...form }: Props) {
+  const editor = useMemo(
+    () => createEditor({ extension: defineBasicExtension() }),
+    []
+  );
+  const { showSaveDialog, handleClose, handleConfirm } =
+    useCloseGuard(form, editor, onClose);
+
   return (
     <div className="bg-card flex h-full flex-1 flex-col overflow-hidden">
-      <ComposeViewHeader onClose={onClose} />
+      <ComposeViewHeader onClose={handleClose} />
       <ComposeFormFields {...form} />
-      <ComposeBody {...form} onClose={onClose} />
+      <ComposeBody {...form} editor={editor} onClose={onClose} />
+      <SaveEmailDialog open={showSaveDialog} onConfirm={handleConfirm} />
     </div>
   );
 }

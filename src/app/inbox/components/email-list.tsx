@@ -137,7 +137,7 @@ function CollapseButton({ onClick }: { onClick: () => void }) {
       size="icon"
       onClick={onClick}
       title="Collapse"
-      className="border-border bg-card hover:bg-accent absolute top-1/2 -right-0.5 z-50 h-10 w-5 -translate-y-1/2 rounded-l-md rounded-r-none border-2 border-r-0"
+      className="border-border bg-card hover:bg-accent absolute top-1/2 -right-0.5 h-10 w-5 -translate-y-1/2 rounded-l-md rounded-r-none border-2 border-r-0"
     >
       <ChevronLeft className="size-4" />
     </Button>
