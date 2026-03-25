@@ -1,12 +1,11 @@
 import { createRoute } from '@/lib/api-route';
 import { db } from '@/db';
-import { email }               from '@/db/schema';
-import { getAccountByUserId }  from '@/lib/mail/account';
+import { email, type Account } from '@/db/schema';
+import { getAccountByUserId } from '@/lib/mail/account';
 import { createSmtpTransport } from '@/lib/mail/smtp-client';
 import { InternalTag } from '@/types/email';
 import { NextResponse } from 'next/server';
 import { SendEmailSchema, type SendEmailData } from '@/models';
-import { type Account } from '@/db/schema';
 
 async function dispatchEmail(account: Account, data: SendEmailData) {
   const transport = createSmtpTransport(account);
@@ -23,12 +22,14 @@ async function dispatchEmail(account: Account, data: SendEmailData) {
 function buildSentValues(
   userId: string,
   accountId: string,
+  fromAddress: string,
   data: SendEmailData
 ) {
   return {
     id: crypto.randomUUID(),
     userId,
     accountId,
+    fromAddress,
     internalTag: InternalTag.Sent,
     to: data.to,
     cc: data.cc ?? '',
@@ -45,9 +46,12 @@ function buildSentValues(
 async function recordSentEmail(
   userId: string,
   accountId: string,
+  fromAddress: string,
   data: SendEmailData
 ) {
-  return db.insert(email).values(buildSentValues(userId, accountId, data));
+  return db
+    .insert(email)
+    .values(buildSentValues(userId, accountId, fromAddress, data));
 }
 
 export const POST = createRoute({
@@ -67,7 +71,12 @@ export const POST = createRoute({
     }
     if (data.simulateReceive) {
       const receivedValues = {
-        ...buildSentValues(session.user.id, account.id, data),
+        ...buildSentValues(
+          session.user.id,
+          account.id,
+          account.accountId,
+          data
+        ),
         internalTag: InternalTag.Inbox,
         fromAddress: data.to,
         fromName: 'Simulation Bot',
@@ -80,7 +89,7 @@ export const POST = createRoute({
     }
 
     await dispatchEmail(account, data);
-    await recordSentEmail(session.user.id, account.id, data);
+    await recordSentEmail(session.user.id, account.id, account.accountId, data);
 
     return NextResponse.json({ status: 'Success' }, { status: 204 });
   },

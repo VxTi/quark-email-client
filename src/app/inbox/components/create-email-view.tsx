@@ -5,11 +5,12 @@ import { XIcon } from 'lucide-react';
 import { defineBasicExtension } from 'prosekit/basic';
 import { createEditor } from 'prosekit/core';
 import { ProseKit } from 'prosekit/react';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import EmailInputMessageToolbar from '@/app/inbox/components/reply-composer/email-input-message-toolbar';
 import SaveEmailDialog from '@/app/inbox/components/save-email-dialog';
 import Button from '@/components/ui/button';
 import { sendEmail } from '@/lib/requests/mail';
+import { type DraftData } from '@/models/email';
 import { toast } from 'sonner';
 
 export interface ComposeFormProps {
@@ -25,6 +26,8 @@ export interface ComposeFormProps {
 
 interface Props extends ComposeFormProps {
   onClose: () => void;
+  onSave: (data: DraftData) => Promise<void>;
+  getBodyRef?: React.MutableRefObject<() => string>;
 }
 
 interface Attachment {
@@ -105,23 +108,30 @@ function hasFormContent({ to, cc, bcc, subject }: ComposeFormProps): boolean {
   return !!(to || cc || bcc || subject);
 }
 
-function useCloseGuard(
+function gatherDraftData(
   form: ComposeFormProps,
-  editor: ReturnType<typeof createEditor>,
-  onClose: () => void
+  editor: ReturnType<typeof createEditor>
+): DraftData {
+  return {
+    to: form.to, cc: form.cc, bcc: form.bcc,
+    subject: form.subject, body: editor.getDocHTML(),
+  };
+}
+
+function useCloseGuard(
+  form: ComposeFormProps, editor: ReturnType<typeof createEditor>,
+  onClose: () => void, onSave: (data: DraftData) => Promise<void>
 ) {
   const [showSaveDialog, setShowSaveDialog] = useState(false);
-
   const handleClose = () => {
     const hasContent = hasFormContent(form) || !isEditorEmpty(editor);
     hasContent ? setShowSaveDialog(true) : onClose();
   };
-
-  const handleConfirm = (_save: boolean) => {
+  const handleConfirm = async (save: boolean) => {
+    if (save) await onSave(gatherDraftData(form, editor));
     setShowSaveDialog(false);
     onClose();
   };
-
   return { showSaveDialog, handleClose, handleConfirm };
 }
 
@@ -286,13 +296,16 @@ function ComposeBody({
   );
 }
 
-export default function CreateEmailView({ onClose, ...form }: Props) {
+export default function CreateEmailView({ onClose, onSave, getBodyRef, ...form }: Props) {
   const editor = useMemo(
     () => createEditor({ extension: defineBasicExtension() }),
     []
   );
+  useEffect(() => {
+    if (getBodyRef) getBodyRef.current = () => editor.getDocHTML();
+  }, [editor, getBodyRef]);
   const { showSaveDialog, handleClose, handleConfirm } =
-    useCloseGuard(form, editor, onClose);
+    useCloseGuard(form, editor, onClose, onSave);
 
   return (
     <div className="bg-card flex h-full flex-1 flex-col overflow-hidden">

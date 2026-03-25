@@ -1,5 +1,5 @@
 import { request } from '@/lib/utils';
-import { type SendEmailData } from '@/models/email';
+import { ApiEmailSchema, type ApiEmail, type DraftData, type SendEmailData } from '@/models/email';
 import { z } from 'zod';
 
 export async function sendEmail(data: SendEmailData): Promise<void> {
@@ -8,5 +8,14 @@ export async function sendEmail(data: SendEmailData): Promise<void> {
     body: JSON.stringify(data),
     headers: { 'Content-Type': 'application/json' },
     decoder: z.null(),
+  });
+}
+
+export async function saveDraft(data: DraftData): Promise<ApiEmail> {
+  return request('/api/mail/drafts', {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: { 'Content-Type': 'application/json' },
+    decoder: ApiEmailSchema,
   });
 }

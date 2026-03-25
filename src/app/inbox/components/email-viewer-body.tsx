@@ -3,6 +3,9 @@ import { motion } from 'framer-motion';
 import Markdown from 'react-markdown';
 import { twMerge } from 'tailwind-merge';
 import type { Email, EmailMessage } from '@/types/email';
+import { sendEmail } from '@/lib/requests/mail';
+import { toast } from 'sonner';
+import { useCallback } from 'react';
 import ResponseInputField from './reply-composer/response-input-field';
 
 const containerVariants = {
@@ -107,7 +110,29 @@ function EmailBubble({ message }: { message: EmailMessage }) {
   );
 }
 
+function useReplySend(email: Email) {
+  return useCallback(
+    async (body: string) => {
+      try {
+        await sendEmail({
+          to: email.from,
+          subject: `Re: ${email.subject}`,
+          body,
+        });
+        toast.success('Reply sent');
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'Failed to send reply';
+        toast.error(message);
+        throw error;
+      }
+    },
+    [email.from, email.subject]
+  );
+}
+
 export default function EmailViewerBody({ email }: { email: Email }) {
+  const onSend = useReplySend(email);
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col overflow-hidden">
       <motion.div
@@ -121,7 +146,7 @@ export default function EmailViewerBody({ email }: { email: Email }) {
           <EmailBubble key={m.id} message={m} />
         ))}
       </motion.div>
-      <ResponseInputField />
+      <ResponseInputField onSend={onSend} />
     </div>
   );
 }
