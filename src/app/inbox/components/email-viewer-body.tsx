@@ -8,7 +8,7 @@ import { sendEmail, updateDraft } from '@/lib/requests/mail';
 import { useEmails } from '@/lib/email-context';
 import { toast } from 'sonner';
 import { type JSX, useCallback, useState } from 'react';
-import ResponseInputField from './reply-composer/response-input-field';
+import EmailInputField                     from './reply-composer/email-input-field';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -277,7 +277,7 @@ export default function EmailViewerBody({ email }: { email: Email }) {
         ))}
         {isDraft && <SendDraftButton email={email} />}
       </motion.div>
-      <ResponseInputField onSend={isDraft ? onAppend : onReply} />
+      <EmailInputField onSend={isDraft ? onAppend : onReply} />
     </div>
   );
 }

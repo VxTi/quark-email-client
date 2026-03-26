@@ -5,9 +5,13 @@ import { XIcon } from 'lucide-react';
 import { defineBasicExtension } from 'prosekit/basic';
 import { createEditor } from 'prosekit/core';
 import { ProseKit } from 'prosekit/react';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import EmailInputMessageToolbar from '@/app/inbox/components/reply-composer/email-input-message-toolbar';
 import SaveEmailDialog from '@/app/inbox/components/save-email-dialog';
+import AttachmentList, {
+  useAttachments,
+  ComposerFooter,
+} from '@/app/inbox/components/reply-composer/composer-attachments';
 import Button from '@/components/ui/button';
 import { sendEmail } from '@/lib/requests/mail';
 import { type DraftData } from '@/models/email';
@@ -27,25 +31,13 @@ export interface ComposeFormProps {
 interface Props extends ComposeFormProps {
   onClose: () => void;
   onSave: (data: DraftData) => Promise<void>;
-  getBodyRef?: React.MutableRefObject<() => string>;
-}
-
-interface Attachment {
-  name: string;
+  getBodyRef?: React.RefObject<() => string>;
 }
 
 interface FieldRowProps {
   label: string;
   value: string;
   onChange: (v: string) => void;
-}
-
-interface ComposeFooterProps {
-  fileRef: React.RefObject<HTMLInputElement | null>;
-  onAttach: () => void;
-  onFiles: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onSend: () => void;
-  sending: boolean;
 }
 
 function ComposeFieldRow({ label, value, onChange }: FieldRowProps) {
@@ -101,7 +93,12 @@ function ComposeFormFields({
 }
 
 function isEditorEmpty(editor: ReturnType<typeof createEditor>): boolean {
-  return editor.getDocHTML().replace(/<[^>]*>/g, '').trim() === '';
+  return (
+    editor
+      .getDocHTML()
+      .replace(/<[^>]*>/g, '')
+      .trim() === ''
+  );
 }
 
 function hasFormContent({ to, cc, bcc, subject }: ComposeFormProps): boolean {
@@ -113,19 +110,28 @@ function gatherDraftData(
   editor: ReturnType<typeof createEditor>
 ): DraftData {
   return {
-    to: form.to, cc: form.cc, bcc: form.bcc,
-    subject: form.subject, bodyHtml: editor.getDocHTML(),
+    to: form.to,
+    cc: form.cc,
+    bcc: form.bcc,
+    subject: form.subject,
+    bodyHtml: editor.getDocHTML(),
   };
 }
 
 function useCloseGuard(
-  form: ComposeFormProps, editor: ReturnType<typeof createEditor>,
-  onClose: () => void, onSave: (data: DraftData) => Promise<void>
+  form: ComposeFormProps,
+  editor: ReturnType<typeof createEditor>,
+  onClose: () => void,
+  onSave: (data: DraftData) => Promise<void>
 ) {
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const handleClose = () => {
     const hasContent = hasFormContent(form) || !isEditorEmpty(editor);
-    hasContent ? setShowSaveDialog(true) : onClose();
+    if (hasContent) {
+      setShowSaveDialog(true);
+    } else {
+      onClose();
+    }
   };
   const handleConfirm = async (save: boolean) => {
     if (save) await onSave(gatherDraftData(form, editor));
@@ -133,94 +139,6 @@ function useCloseGuard(
     onClose();
   };
   return { showSaveDialog, handleClose, handleConfirm };
-}
-
-function useComposeAttachments() {
-  const [attachments, setAttachments] = useState<Attachment[]>([]);
-  const fileRef = useRef<HTMLInputElement>(null);
-  const onAttach = () => fileRef.current?.click();
-  const onFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []);
-    setAttachments(prev => [...prev, ...files.map(f => ({ name: f.name }))]);
-    e.target.value = '';
-  };
-  const remove = (name: string) => {
-    setAttachments(prev => prev.filter(a => a.name !== name));
-  };
-  return { attachments, fileRef, onAttach, onFiles, remove };
-}
-
-function ComposeAttachmentChip({
-  name,
-  onRemove,
-}: {
-  name: string;
-  onRemove: () => void;
-}) {
-  return (
-    <div className="bg-muted border-border text-muted-foreground flex items-center gap-1.5 rounded-lg border-2 px-2.5 py-1 text-xs">
-      <span>📎</span>
-      <span className="max-w-30 truncate">{name}</span>
-      <button
-        type="button"
-        onClick={onRemove}
-        className="hover:text-foreground ml-0.5 cursor-pointer leading-none"
-      >
-        ×
-      </button>
-    </div>
-  );
-}
-
-function ComposeAttachmentList({
-  attachments,
-  onRemove,
-}: {
-  attachments: Attachment[];
-  onRemove: (name: string) => void;
-}) {
-  if (!attachments.length) return null;
-  return (
-    <div className="border-border flex shrink-0 flex-wrap gap-2 border-t-2 px-4 py-2">
-      {attachments.map(a => (
-        <ComposeAttachmentChip
-          key={a.name}
-          name={a.name}
-          onRemove={() => {
-            onRemove(a.name);
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-function ComposeBodyFooter({
-  fileRef,
-  onAttach,
-  onFiles,
-  onSend,
-  sending,
-}: ComposeFooterProps) {
-  return (
-    <div className="border-border flex shrink-0 items-center justify-between border-t-2 px-4 py-3">
-      <div className="flex">
-        <input
-          ref={fileRef}
-          type="file"
-          multiple
-          className="hidden"
-          onChange={onFiles}
-        />
-        <Button variant="ghost" onClick={onAttach}>
-          📎
-        </Button>
-      </div>
-      <Button onClick={onSend} disabled={sending}>
-        {sending ? 'Sending...' : 'Send'}
-      </Button>
-    </div>
-  );
 }
 
 function ComposeBodyEditor({
@@ -241,36 +159,23 @@ function ComposeBodyEditor({
   );
 }
 
-function ComposeBody({
-  to,
-  cc,
-  bcc,
-  subject,
-  editor,
-  onClose,
-}: {
-  to: string;
-  cc: string;
-  bcc: string;
-  subject: string;
+interface ComposeBodyProps {
+  form: ComposeFormProps;
   editor: ReturnType<typeof createEditor>;
   onClose: () => void;
-}) {
-  const { attachments, fileRef, onAttach, onFiles, remove } =
-    useComposeAttachments();
-  const [sending, setSending] = useState(false);
+}
 
-  const onSend = async () => {
+function useComposeSend(
+  form: ComposeFormProps,
+  editor: ReturnType<typeof createEditor>,
+  onClose: () => void
+) {
+  const [sending, setSending] = useState(false);
+  const handleSend = async () => {
     setSending(true);
     try {
-      await sendEmail({
-        to,
-        cc,
-        bcc,
-        subject,
-        bodyHtml: editor.getDocHTML(),
-      });
-
+      const { to, cc, bcc, subject } = form;
+      await sendEmail({ to, cc, bcc, subject, bodyHtml: editor.getDocHTML() });
       onClose();
     } catch (error) {
       const message =
@@ -280,23 +185,38 @@ function ComposeBody({
       setSending(false);
     }
   };
+  return { sending, handleSend };
+}
 
+function ComposeBody({ form, editor, onClose }: ComposeBodyProps) {
+  const { attachments, fileRef, onAttach, onFiles, remove } = useAttachments();
+  const { sending, handleSend } = useComposeSend(form, editor, onClose);
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       <ComposeBodyEditor editor={editor} />
-      <ComposeAttachmentList attachments={attachments} onRemove={remove} />
-      <ComposeBodyFooter
+      <AttachmentList
+        attachments={attachments}
+        onRemove={remove}
+        className="border-border shrink-0 border-t-2 px-4 py-2"
+      />
+      <ComposerFooter
         fileRef={fileRef}
         onAttach={onAttach}
         onFiles={onFiles}
-        onSend={onSend}
+        onSend={handleSend}
         sending={sending}
+        className="border-t-2 px-4 py-3"
       />
     </div>
   );
 }
 
-export default function CreateEmailView({ onClose, onSave, getBodyRef, ...form }: Props) {
+export default function CreateEmailView({
+  onClose,
+  onSave,
+  getBodyRef,
+  ...form
+}: Props) {
   const editor = useMemo(
     () => createEditor({ extension: defineBasicExtension() }),
     []
@@ -304,14 +224,18 @@ export default function CreateEmailView({ onClose, onSave, getBodyRef, ...form }
   useEffect(() => {
     if (getBodyRef) getBodyRef.current = () => editor.getDocHTML();
   }, [editor, getBodyRef]);
-  const { showSaveDialog, handleClose, handleConfirm } =
-    useCloseGuard(form, editor, onClose, onSave);
+  const { showSaveDialog, handleClose, handleConfirm } = useCloseGuard(
+    form,
+    editor,
+    onClose,
+    onSave
+  );
 
   return (
     <div className="bg-card flex h-full flex-1 flex-col overflow-hidden">
       <ComposeViewHeader onClose={handleClose} />
       <ComposeFormFields {...form} />
-      <ComposeBody {...form} editor={editor} onClose={onClose} />
+      <ComposeBody form={form} editor={editor} onClose={onClose} />
       <SaveEmailDialog open={showSaveDialog} onConfirm={handleConfirm} />
     </div>
   );

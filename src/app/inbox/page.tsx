@@ -1,15 +1,14 @@
 'use client';
-import { useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import CreateEmailView from '@/app/inbox/components/create-email-view';
-import EmailList       from '@/app/inbox/components/email-list';
+import EmailList from '@/app/inbox/components/email-list';
 import EmailViewer from '@/app/inbox/components/email-viewer';
 import SaveEmailDialog from '@/app/inbox/components/save-email-dialog';
 import Sidebar from '@/app/inbox/components/sidebar';
 import { useEmails } from '@/lib/email-context';
 import { saveDraft } from '@/lib/requests/mail';
 import { type DraftData } from '@/models/email';
-import { type ActiveFilter } from '@/types/email';
-import type { Email } from '@/types/email';
+import { type ActiveFilter, type Email } from '@/types/email';
 
 function useComposeForm() {
   const [to, setTo] = useState('');
@@ -68,14 +67,17 @@ function useConfirmSave(
   form: ReturnType<typeof useComposeForm>,
   comp: ReturnType<typeof useComposing>,
   setSelected: (e: Email | null) => void,
-  getBody: React.MutableRefObject<() => string>
+  getBody: React.RefObject<() => string>
 ) {
   const { addEmail } = useEmails();
   return async (save: boolean) => {
     if (save) {
       const data: DraftData = {
-        to: form.to, cc: form.cc, bcc: form.bcc,
-        subject: form.subject, bodyHtml: getBody.current(),
+        to: form.to,
+        cc: form.cc,
+        bcc: form.bcc,
+        subject: form.subject,
+        bodyHtml: getBody.current(),
       };
       addEmail(await saveDraft(data));
     }
@@ -86,7 +88,7 @@ function useConfirmSave(
 
 function useInboxState(
   form: ReturnType<typeof useComposeForm>,
-  getBody: React.MutableRefObject<() => string>
+  getBody: React.RefObject<() => string>
 ) {
   const { emails, deleteEmails } = useEmails();
   const [selected, setSelected] = useState<Email | null>(null);
@@ -131,7 +133,12 @@ export default function InboxPage() {
         filter={filter}
       />
       {state.composing ? (
-        <CreateEmailView onClose={state.close} onSave={onSave} getBodyRef={getBodyRef} {...form} />
+        <CreateEmailView
+          onClose={state.close}
+          onSave={onSave}
+          getBodyRef={getBodyRef}
+          {...form}
+        />
       ) : (
         <EmailViewer email={state.selected} />
       )}

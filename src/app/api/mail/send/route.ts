@@ -89,6 +89,8 @@ export const POST = createRoute({
       return NextResponse.json({ status: 'Success' }, { status: 204 });
     }
 
+    console.log('Dispatching email', { account, data });
+
     await dispatchEmail(account, data);
     await recordSentEmail(session.user.id, account.id, account.accountId, data);
 

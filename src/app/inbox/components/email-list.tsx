@@ -2,8 +2,8 @@
 import { Field } from '@base-ui/react/field';
 import {
   CheckSquare,
-  ChevronLeft,
   ChevronRight,
+  GripVerticalIcon,
   Search,
   Trash2,
   X,
@@ -109,7 +109,7 @@ function ResizeHandle({
   return (
     <div
       onMouseDown={onMouseDown}
-      className="hover:bg-border absolute top-0 right-0 z-10 h-full w-1 cursor-col-resize transition-colors"
+      className="hover:bg-border absolute top-0 right-0 z-10 h-full w-2 translate-x-1 cursor-col-resize transition-colors"
     />
   );
 }
@@ -130,17 +130,9 @@ function ExpansionButton({ onClick }: { onClick: () => void }) {
   );
 }
 
-function CollapseButton({ onClick }: { onClick: () => void }) {
+function GripIcon() {
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={onClick}
-      title="Collapse"
-      className="border-border bg-card hover:bg-accent absolute top-1/2 -right-0.5 h-10 w-5 -translate-y-1/2 rounded-l-md rounded-r-none border-2 border-r-0"
-    >
-      <ChevronLeft className="size-4" />
-    </Button>
+    <GripVerticalIcon className="border-border bg-card hover:bg-accent pointer-events-none absolute top-1/2 -right-2.5 z-10 size-4 h-10 w-5 -translate-y-1/2 rounded-md border-2" />
   );
 }
 
@@ -347,11 +339,9 @@ function EmailListBody() {
 function EmailListContent({
   width,
   onHandleMouseDown,
-  onCollapse,
 }: {
   width: number;
   onHandleMouseDown: (e: React.MouseEvent) => void;
-  onCollapse: () => void;
 }) {
   const { searching } = useEmailList();
   return (
@@ -363,7 +353,7 @@ function EmailListContent({
       {searching && <SearchBar />}
       <EmailListBody />
       <ResizeHandle onMouseDown={onHandleMouseDown} />
-      <CollapseButton onClick={onCollapse} />
+      <GripIcon />
     </div>
   );
 }
@@ -377,7 +367,6 @@ function ResizableEmailList(props: ResizableProps) {
     filter,
     width,
     onHandleMouseDown,
-    onCollapse,
   } = props;
   return (
     <EmailListProvider
@@ -387,11 +376,7 @@ function ResizableEmailList(props: ResizableProps) {
       onDelete={onDelete}
       filter={filter}
     >
-      <EmailListContent
-        width={width}
-        onHandleMouseDown={onHandleMouseDown}
-        onCollapse={onCollapse}
-      />
+      <EmailListContent width={width} onHandleMouseDown={onHandleMouseDown} />
     </EmailListProvider>
   );
 }
