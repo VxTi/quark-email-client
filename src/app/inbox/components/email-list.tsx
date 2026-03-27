@@ -250,7 +250,7 @@ function TagSubmenu({ email }: { email: Email }) {
   return (
     <ContextMenuSub>
       <ContextMenuSubTrigger>Add Tag</ContextMenuSubTrigger>
-      <ContextMenuSubContent>
+      <ContextMenuSubContent className="border-border border-2">
         {available.length === 0 && (
           <ContextMenuItem disabled>No tags available</ContextMenuItem>
         )}
@@ -281,7 +281,7 @@ function EmailItemMenu({
   return (
     <ContextMenu>
       <ContextMenuTrigger>{children}</ContextMenuTrigger>
-      <ContextMenuContent>
+      <ContextMenuContent className="border-border border-2">
         <TagSubmenu email={email} />
         <ContextMenuSeparator />
         <ContextMenuItem

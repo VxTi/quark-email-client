@@ -58,6 +58,7 @@ const allowedHtmlTags: (keyof JSX.IntrinsicElements)[] = [
   'p',
   'li',
   'ul',
+  'u',
   'ol',
   'span',
   'b',

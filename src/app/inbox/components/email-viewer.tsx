@@ -16,6 +16,8 @@ function EmptyState() {
 
 export default function EmailViewer({ email }: Props) {
   if (!email) return <EmptyState />;
+
+  console.log(email);
   return (
     <div className="bg-card flex h-full flex-1 flex-col overflow-hidden">
       <EmailViewerHeader email={email} />

@@ -1,5 +1,10 @@
 import { request } from '@/lib/utils';
-import { ApiEmailSchema, type ApiEmail, type DraftData, type SendEmailData } from '@/models/email';
+import {
+  ApiEmailSchema,
+  type ApiEmail,
+  type DraftData,
+  type SendEmailData,
+} from '@/models/email';
 import { z } from 'zod';
 
 export async function sendEmail(data: SendEmailData): Promise<void> {
@@ -20,7 +25,10 @@ export async function saveDraft(data: DraftData): Promise<ApiEmail> {
   });
 }
 
-export async function updateDraft(id: string, data: DraftData): Promise<ApiEmail> {
+export async function updateDraft(
+  id: string,
+  data: DraftData
+): Promise<ApiEmail> {
   return request(`/api/mail/drafts/${id}`, {
     method: 'PUT',
     body: JSON.stringify(data),

@@ -16,20 +16,20 @@ export const PUT = createRoute({
     validator: DraftDataSchema,
   },
   handler: async ({ session, data, params }) => {
-    const [updated] = await db
+    const updated = await db
       .update(email)
       .set({
-        to: data.to ?? '',
-        cc: data.cc ?? '',
-        bcc: data.bcc ?? '',
-        subject: data.subject ?? '',
-        bodyHtml: data.bodyHtml ?? '',
+        ...data,
         updatedAt: new Date(),
       })
       .where(and(eq(email.id, params.id), eq(email.userId, session.user.id)))
-      .returning();
-    if (!updated)
+      .returning()
+      .then(res => res.at(0));
+
+    if (!updated) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    }
+
     return NextResponse.json(updated);
   },
 });

@@ -29,7 +29,7 @@ export type ApiEmail = z.infer<typeof ApiEmailSchema>;
 
 export const EmailDataSchema = z.object({
   tagId: z.string().optional(),
-  internalTag: z.nativeEnum(InternalTag).optional(),
+  internalTag: z.enum(InternalTag).optional(),
   to: z.string().optional(),
   cc: z.string().optional(),
   bcc: z.string().optional(),
