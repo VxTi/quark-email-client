@@ -8,8 +8,8 @@ import React, { useMemo, useState } from 'react';
 import AttachmentList, {
   useAttachments,
   ComposerFooter,
-} from '@/app/inbox/components/reply-composer/composer-attachments';
-import EmailInputMessageToolbar from '@/app/inbox/components/reply-composer/email-input-message-toolbar';
+}                                 from '@/app/inbox/components/reply-composer/composer-attachments';
+import EmailInputMessageActionBar from '@/app/inbox/components/reply-composer/email-input-message-action-bar';
 
 interface ResponseInputProps {
   onSend: (body: string) => Promise<void>;
@@ -53,7 +53,7 @@ function ComposerInput({
   return (
     <div className="bg-card border-border flex flex-col overflow-hidden rounded-xl border">
       <ProseKit editor={editor}>
-        <EmailInputMessageToolbar />
+        <EmailInputMessageActionBar />
         <div
           ref={editor.mount as React.Ref<HTMLDivElement>}
           className="text-foreground max-h-40 min-h-15 overflow-y-auto px-3 py-2 text-sm leading-relaxed outline-none"
@@ -66,9 +66,7 @@ function ComposerInput({
         onSend={onSend}
         sending={sending}
         className="px-2 py-1.5"
-      >
-        <SendIcon className="size-4" />
-      </ComposerFooter>
+      />
     </div>
   );
 }

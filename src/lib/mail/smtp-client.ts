@@ -9,7 +9,7 @@ interface SmtpSettings {
   secure: boolean;
 }
 
-const knownProviders: Record<string, SmtpSettings | undefined> = {
+const knownProviders = {
   'outlook.com': { host: 'smtp-mail.outlook.com', port: 587, secure: false },
   'hotmail.com': { host: 'smtp-mail.outlook.com', port: 587, secure: false },
   'live.com': { host: 'smtp-mail.outlook.com', port: 587, secure: false },
@@ -19,12 +19,20 @@ const knownProviders: Record<string, SmtpSettings | undefined> = {
   'me.com': { host: 'smtp.mail.me.com', port: 587, secure: false },
   'aol.com': { host: 'smtp.aol.com', port: 587, secure: false },
   'zoho.com': { host: 'smtp.zoho.com', port: 587, secure: false },
-};
+} satisfies Record<string, SmtpSettings | undefined>;
+
+type KnownProvider = keyof typeof knownProviders;
+
+function isKnownProvider(domain: string): domain is KnownProvider {
+  return domain in knownProviders;
+}
 
 async function resolveSmtpSettings(email: string): Promise<SmtpSettings> {
   const domain = email.split('@').at(1)?.toLowerCase() ?? '';
 
-  if (knownProviders[domain]) return knownProviders[domain];
+  if (isKnownProvider(domain)) {
+    return knownProviders[domain];
+  }
 
   // 1. Try SRV Records (Submission / SMTPS)
   try {

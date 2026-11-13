@@ -6,7 +6,7 @@ import { defineBasicExtension } from 'prosekit/basic';
 import { createEditor } from 'prosekit/core';
 import { ProseKit } from 'prosekit/react';
 import React, { useEffect, useMemo, useState } from 'react';
-import EmailInputMessageToolbar from '@/app/inbox/components/reply-composer/email-input-message-toolbar';
+import EmailInputMessageActionBar from '@/app/inbox/components/reply-composer/email-input-message-action-bar';
 import SaveEmailDialog from '@/app/inbox/components/save-email-dialog';
 import AttachmentList, {
   useAttachments,
@@ -149,7 +149,7 @@ function ComposeBodyEditor({
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       <ProseKit editor={editor}>
-        <EmailInputMessageToolbar />
+        <EmailInputMessageActionBar />
         <div
           ref={editor.mount as React.Ref<HTMLDivElement>}
           className="text-foreground flex-1 overflow-y-auto px-4 py-3 text-sm leading-relaxed outline-none"
@@ -193,7 +193,6 @@ function ComposeBody({ form, editor, onClose }: ComposeBodyProps) {
   const { sending, handleSend } = useComposeSend(form, editor, onClose);
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
-      <ComposeBodyEditor editor={editor} />
       <AttachmentList
         attachments={attachments}
         onRemove={remove}
@@ -207,6 +206,7 @@ function ComposeBody({ form, editor, onClose }: ComposeBodyProps) {
         sending={sending}
         className="border-t-2 px-4 py-3"
       />
+      <ComposeBodyEditor editor={editor} />
     </div>
   );
 }

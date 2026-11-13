@@ -12,7 +12,7 @@ import {
 import type { BasicExtension } from 'prosekit/basic';
 import type { Editor } from 'prosekit/core';
 import { useEditorDerivedValue } from 'prosekit/react';
-import EmailInputToolbarButton   from './email-input-toolbar-button';
+import EmailInputToolbarButton from './email-input-toolbar-button';
 
 type Ed = Editor<BasicExtension>;
 interface ToolItem {
@@ -109,7 +109,7 @@ function ToolbarItem({ item }: { item: ToolItem }) {
   );
 }
 
-export default function EmailInputMessageToolbar() {
+export default function EmailInputMessageActionBar() {
   const items = useEditorDerivedValue(getItems);
   return (
     <div className="border-border flex flex-wrap gap-0.5 border-b px-2 py-1.5">

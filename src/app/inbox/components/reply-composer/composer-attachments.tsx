@@ -1,4 +1,5 @@
 'use client';
+import { SendIcon } from 'lucide-react';
 import React, { useRef, useState } from 'react';
 import Button from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -60,7 +61,9 @@ export default function AttachmentList({
         <AttachmentChip
           key={a.name}
           name={a.name}
-          onRemove={() => onRemove(a.name)}
+          onRemove={() => {
+            onRemove(a.name);
+          }}
         />
       ))}
     </div>
@@ -74,7 +77,6 @@ export interface ComposerFooterProps {
   onSend: () => void;
   sending: boolean;
   className?: string;
-  children?: React.ReactNode;
 }
 
 function FileInput({
@@ -105,14 +107,18 @@ export function ComposerFooter({
   onSend,
   sending,
   className,
-  children,
 }: ComposerFooterProps) {
   return (
-    <div className={cn('border-border flex shrink-0 items-center justify-between border-t', className)}>
+    <div
+      className={cn(
+        'border-border flex shrink-0 items-center justify-between border-t',
+        className
+      )}
+    >
       <FileInput fileRef={fileRef} onAttach={onAttach} onFiles={onFiles} />
-      <Button onClick={onSend} disabled={sending}>
+      <Button onClick={onSend} disabled={sending} className="gap-2">
         {sending ? 'Sending...' : 'Send'}
-        {children}
+        <SendIcon className="size-4" />
       </Button>
     </div>
   );
